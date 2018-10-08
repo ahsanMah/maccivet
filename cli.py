@@ -44,33 +44,17 @@ def convertToHuman(INPUT_T1, INPUT_SEG, INPUT_SUB):
 	INPUT_SEG = INPUT_SEG_XYFLIP
 	INPUT_SUB = INPUT_SUB_XYFLIP
 
-	##### TODO: SHOULD BE MADE AVILABLE VIA PARAMETER FILE ######
-	Transform_MonkeyToHuman = '/nas/longleaf/home/shykim/21-MONKEY/new_MonkeyToHuman.txt'
-	Human_Template = '/nas/longleaf/home/shykim/21-MONKEY/mni_target_xyflip.nrrd' ## MNI 0.5mm iso template 
-
-	LikeHuman_T1 = INPUT_T1.replace(".nrrd", '_LikeHuman.nrrd' )
-	LikeHuman_SEG = INPUT_SEG.replace(".nrrd", '_LikeHuman.nrrd')
-	LikeHuman_SUB = INPUT_SUB.replace(".nrrd", '_LikeHuman.nrrd')
-
-
-	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(INPUT_T1, LikeHuman_T1, Human_Template, Transform_MonkeyToHuman) )
-	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(INPUT_SEG, LikeHuman_SEG, Human_Template, Transform_MonkeyToHuman) )
-	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(INPUT_SUB, LikeHuman_SUB, Human_Template, Transform_MonkeyToHuman) )
-	
-	## CIVET accepts MINC files so we need one last conversion
-	LikeHuman_T1_MINC = LikeHuman_T1.replace(".nrrd", '.mnc')
-	LikeHuman_SEG_MINC = LikeHuman_SEG.replace(".nrrd", '.mnc')
-	LikeHuman_SUB_MINC = LikeHuman_SUB.replace(".nrrd", '.mnc')
-
-	runsh("itk_convert {} {} ".format(LikeHuman_T1, LikeHuman_T1_MINC) )
-	runsh("itk_convert {} {} ".format(LikeHuman_SEG, LikeHuman_SEG_MINC) )
-	runsh("itk_convert {} {} ".format(LikeHuman_SUB, LikeHuman_SUB_MINC) )
+	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = list(map(warpMonkeyImage, [INPUT_T1, INPUT_SEG, INPUT_SUB] ))
 
 	return LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC
 
-def warpMonkeyImage(Input_Img, Human_Template):
+'''
+Warps the Macaque brain image to the human template
+'''
+def warpMonkeyImage(Input_Img):
 	##### TODO: SHOULD BE MADE AVILABLE VIA PARAMETER FILE ######
 	Transform_MonkeyToHuman = '/nas/longleaf/home/shykim/21-MONKEY/new_MonkeyToHuman.txt'
+	Human_Template = '/nas/longleaf/home/shykim/21-MONKEY/mni_target_xyflip.nrrd' ## MNI 0.5mm iso template 
 
 	LikeHuman = Input_Img.replace(".nrrd", '_LikeHuman.nrrd' )
 	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(Input_Img, LikeHuman, Human_Template, Transform_MonkeyToHuman) )
@@ -88,6 +72,7 @@ Entry point for executing the modified CIVET pipeline
 def execute(args):
 
 	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = convertToHuman(args.t1_image, args.seg_label, args.sub_label)
+	# print(convertToHuman(args.t1_image, args.seg_label, args.sub_label))
 
 '''
 Specifies all the arguments that the parser can take
