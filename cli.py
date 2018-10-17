@@ -11,9 +11,16 @@
 ######################################################################################################### 
 
 
-import argparse, os
+import argparse, os, re
 from subprocess import run
 
+#### Labels ####
+WM = 1
+GM = 2
+
+HIPPO_L = 1
+HIPPO_R = 5
+################
 
 # runsh = lambda x: run(x,shell=True)
 
@@ -62,8 +69,21 @@ def warpMonkeyImage(Input_Img):
 	## CIVET accepts MINC files so we need one last conversion
 	LikeHuman_MINC = LikeHuman.replace(".nrrd", '.mnc')
 
-	runsh("itk_convert {} {} ".format(LikeHuman, LikeHuman_MINC) )
+	runsh("itk_convert {} {}".format(LikeHuman, LikeHuman_MINC) )
 	return LikeHuman_MINC
+
+def excludeHippo(LikeHuman_SUB_MINC):
+	LikeHuman_SUB_MINC_HIPPO = LikeHuman_SUB_MINC.replace(".mnc", '_Hippo.mnc')
+	LikeHuman_SEG_MINC_exHippo = LikeHuman_SEG_MINC.replace(".mnc", '_excludeHippo.mnc')
+	# Convert Hippo into WM
+	# Note that the values (0.5,1.5,etc.) correspond to label values
+	# so they can vary and should be predefined by user in param file 1=WM label in seg_minc
+	runsh("minccalc -byte -expr 'if(A[0]>0.5 && A[0]<1.5 || A[0]>4.5 && A[0]<5.5 ){out=1}else{out=0}' %s %s" %(LikeHuman_SUB_MINC, LikeHuman_SUB_MINC_HIPPO) )
+	runsh("mincmorph -clobber -successive DD {} {}".format(LikeHuman_SUB_MINC_HIPPO, LikeHuman_SUB_MINC_HIPPO) )
+	
+	# If label is 1, in Hippo file, then it is WM in exHippo
+	# o/w just label according to normal segemntation
+	runsh("minccalc -byte -expr 'if(A[0]>0){out=1}else{out=A[1]}' {} {} {}".format(LikeHuman_SUB_MINC_HIPPO, LikeHuman_SEG_MINC, LikeHuman_SEG_MINC_exHippo) )
 
 
 '''
@@ -73,6 +93,24 @@ def execute(args):
 
 	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = convertToHuman(args.t1_image, args.seg_label, args.sub_label)
 	# print(convertToHuman(args.t1_image, args.seg_label, args.sub_label))
+	print(LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC)
+
+	INPUT_T1 = LikeHuman_T1_MINC
+	
+	# Build stx file if it doesn't exist
+	prefix = "stx_"
+	suffix = "_t1.mnc"
+	if INPUT_T1.endswith(suffix) and INPUT_T1.startswith(prefix):
+		exp = "^({})(.*)({})$".format(prefix, suffix)
+		INPUT_FILE_NAME = re.match(exp, INPUT_T1).group(2)
+	else:
+		exp = "(.*)(\.mnc)$"
+		INPUT_FILE_NAME = re.match(exp, INPUT_T1).group(1)
+		ReINPUT_T1 = prefix + INPUT_FILE_NAME + suffix
+		run.sh("cp %s %s" %(INPUT_T1, ReINPUT_T1) )
+
+	# RUN CIVET
+	runsh("%sCIVET_Processing_Pipeline -input_is_stx -surfreg-model mmuMonkey -prefix %s -sourcedir ./ -targetdir ./ -N3-distance 200 -template 0.50 -lsq12 -resample-surfaces -thickness tlaplace:tfs:tlink 30:20 -combine-surface -animal -lobe_atlas icbm152nl-2009a -no-calibrate-white -reset-to pve -spawn -run %s > %s" %(CIVET_SCRIPT_PATH, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log'))
 
 '''
 Specifies all the arguments that the parser can take
@@ -89,7 +127,7 @@ def make_parser():
 
 def verify_file(fname):
 	if not os.path.isfile(fname):
-		print("File \'{}\' does not exist".format(fname))
+		raise FileNotFoundError("File \'{}\' does not exist".format(fname))
 
 
 if __name__ == "__main__":
@@ -101,5 +139,4 @@ if __name__ == "__main__":
 
 	verify_file(args.t1_image)
 	execute(args)
-	# print(args)
 
