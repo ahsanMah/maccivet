@@ -25,7 +25,6 @@ HIPPO_L = 1
 HIPPO_R = 5
 ################
 
-Current_dir = os.getcwd() + '/'
 
 '''
 Wrapper for the run function in the subprocess module

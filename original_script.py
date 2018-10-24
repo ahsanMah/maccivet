@@ -135,6 +135,7 @@ def main(opts, argv):
 	CSF_BIN_SKEL = CSF_BIN[:-4] + '_skel.mnc'
 	CSF_BIN_SKEL_DEF = CSF_BIN_SKEL[:-4] + '_defrag.mnc'
 	PVE_CG = CIVET_CLASSIFY_PATH + 'pve'
+	############## DONE ##########################
 	# Remove noise
 	os.system("minccalc -byte -expr 'if(A[0]>0.0 && A[1]>0){out=1}else{out=0}' %s %s %s" %(PVE_EXACTCSF, RSL_ABC_SEG2 ,CSF_BIN) )
 	os.system("mincmorph -dilation %s %s" %(CSF_BIN, CSF_BIN_DIL) )

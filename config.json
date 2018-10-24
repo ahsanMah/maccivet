@@ -1,0 +1,14 @@
+{
+	"CIVET":{
+		"flags": ["-input_is_stx","-lsq12","-resample-surfaces","-combine-surface","-animal","-no-calibrate-white"],
+		"-sourcedir":"./",
+		"-targetdir": "./", 
+		"-N3-distance": 200,
+		"-template": 0.50,
+		"-surfreg-model": "mmuMonkey",
+		"-thickness": "tlaplace:tfs:tlink 30:20",
+		"-lobe_atlas": "icbm152nl-2009a"
+	},
+	"CIVET_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1-longleaf/Linux-x86_64/CIVET-2.1.0/"
+
+}
