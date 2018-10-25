@@ -14,16 +14,28 @@ class Parameters(object):
 	FLAGS = "flags"
 	CIVET = "CIVET"
 	CIVET_PATH = "CIVET_Path"
+	FILEPATHS = "file_paths"
 
-	def __init__(self, config_json):
-		self.strings = {}
-		self.config = config_json
+	def __init__(self, configfile):
+		# Dictionary of the parameters adn their values
+		self.config = {}
+		# The CIVET command line arguments
+		self.civet = {}
+		# Paths to various files used by the pipeline
+		self.filepaths = {}
+
+		with open(configfile,'r') as cf:
+			self.config = json.load(cf)
+
+		self.buildFilePaths()
+		self.buildCivetParams()
 
 
 	'''Accepts a type of paramter and builds the corresponding string
 	'''
-	def buildParamString(self, ptype):
-		params = self.config[ptype]
+	def buildCivetParams(self):
+		params = self.config[Parameters.CIVET]
+
 		final_str = ""
 		flag_str = ""
 
@@ -34,10 +46,13 @@ class Parameters(object):
 		concat = lambda x,y: "{} {}".format(x, y)
 		args = " ".join([concat(p,params[p]) for p in params])
 
-		final_str = "{}/CIVET_Processing_Pipeline {} {}".format(self.config[Parameters.CIVET_PATH], flag_str, args)
+		final_str = "{}/CIVET_Processing_Pipeline {} {}".format(
+			self.filepaths[Parameters.CIVET_PATH], flag_str, args)
 
-		self.strings[ptype] = final_str
+		self.civet = final_str
 
+	def buildFilePaths(self):
+		self.filepaths = self.config[Parameters.FILEPATHS]
 
 
 '''
@@ -51,6 +66,8 @@ def make_parser():
 	parser.add_argument("seg_label", help="label file that defines all the segmentations")
 	parser.add_argument("sub_label", help="label file for subcortical structures like the hippocampus")
 
+	parser.add_argument("-p","--paramfile", default="config.json", help="path to custom parameter file (default is config.json)")
+
 	return parser
 
 def verify_file(fname):
@@ -61,23 +78,14 @@ def verify_file(fname):
 
 
 if __name__ == "__main__":
-	print("Hello there!")
+	print("Initializing...")
 	parser = make_parser()
 
 	args = parser.parse_args()
 
-	config_params = {}
-	with open("config.json",'r') as cf:
-		config_params = json.load(cf)
+	params = Parameters(args.paramfile)
 
+	print(params.filepaths)
 
-	# for param in config_params:
-	# 	print(buildParamString(config_params[param]))
-	print(config_params)
-
-	params = Parameters(config_params)
-	params.buildParamString(Parameters.CIVET)
-	print(params.strings)
-
-	# verify_file(args.t1_image)
-	# pipeline.execute(args)
+	verify_file(args.t1_image)
+	pipeline.execute(args, params)

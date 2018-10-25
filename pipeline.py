@@ -37,7 +37,7 @@ def runsh(exec_str, **kwargs):
 
 
 
-def execute(args):
-	INPUT_FILE_NAME, LikeHuman_SEG_MINC_exHippo = phase1.execute(args)
+def execute(args, params):
+	INPUT_FILE_NAME, LikeHuman_SEG_MINC_exHippo = phase1.execute(args, params)
 
 	phase2.execute(INPUT_FILE_NAME)

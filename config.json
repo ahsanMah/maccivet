@@ -9,6 +9,12 @@
 		"-thickness": "tlaplace:tfs:tlink 30:20",
 		"-lobe_atlas": "icbm152nl-2009a"
 	},
-	"CIVET_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1-longleaf/Linux-x86_64/CIVET-2.1.0/"
 
+	"file_paths":{
+		"CIVET_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1-longleaf/Linux-x86_64/CIVET-2.1.0/",
+
+		"Transform_MonkeyToHuman": "/nas/longleaf/home/shykim/21-MONKEY/new_MonkeyToHuman.txt",
+
+		"Human_Template": "/nas/longleaf/home/shykim/21-MONKEY/mni_target_xyflip.nrrd"
+	}
 }

@@ -22,7 +22,6 @@ from subprocess import run
 # HIPPO_R = 5
 ################
 
-# runsh = lambda x: run(x,shell=True)
 
 '''
 Wrapper for the run function in the subprocess module
@@ -60,8 +59,8 @@ Warps the Macaque brain image to the human template
 '''
 def warpMonkeyImage(Input_Img):
 	##### TODO: SHOULD BE MADE AVILABLE VIA PARAMETER FILE ######
-	Transform_MonkeyToHuman = '/nas/longleaf/home/shykim/21-MONKEY/new_MonkeyToHuman.txt'
-	Human_Template = '/nas/longleaf/home/shykim/21-MONKEY/mni_target_xyflip.nrrd' ## MNI 0.5mm iso template 
+	Transform_MonkeyToHuman = PARAMS.filepaths["Transform_MonkeyToHuman"]
+	Human_Template = PARAMS.filepaths["Human_Template"] ## MNI 0.5mm iso template 
 
 	LikeHuman = Input_Img.replace(".nrrd", '_LikeHuman.nrrd' )
 	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(Input_Img, LikeHuman, Human_Template, Transform_MonkeyToHuman) )
@@ -91,7 +90,10 @@ def excludeHippo(LikeHuman_SUB_MINC, LikeHuman_SEG_MINC):
 '''
 Entry point for executing the modified CIVET pipeline
 '''
-def execute(args):
+def execute(args, param_obj):
+
+	global PARAMS 
+	PARAMS = param_obj
 
 	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = convertToHuman(args.t1_image, args.seg_label, args.sub_label)
 	# print(convertToHuman(args.t1_image, args.seg_label, args.sub_label))
@@ -113,6 +115,7 @@ def execute(args):
 		runsh("cp %s %s" %(INPUT_T1, ReINPUT_T1) )
 
 	# RUN CIVET
+	CIVET_Config = "{0} -prefix {1} -reset-to pve -spawn -run {2} > {3}".format(PARAMS.civet, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log') 
 	# runsh("%sCIVET_Processing_Pipeline -input_is_stx -surfreg-model mmuMonkey -prefix %s -sourcedir ./ -targetdir ./ -N3-distance 200 -template 0.50 -lsq12 -resample-surfaces -thickness tlaplace:tfs:tlink 30:20 -combine-surface -animal -lobe_atlas icbm152nl-2009a -no-calibrate-white -reset-to pve -spawn -run %s > %s" %(CIVET_SCRIPT_PATH, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log'))
-
+	print(CIVET_Config)
 	return INPUT_FILE_NAME, LikeHuman_SEG_MINC_exHippo
