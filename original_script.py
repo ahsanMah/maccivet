@@ -77,7 +77,7 @@ def main(opts, argv):
 	os.system("minccalc -byte -expr 'if(A[0]>0.5 && A[0]<1.5 || A[0]>4.5 && A[0]<5.5 ){out=1}else{out=0}' %s %s" %(LikeHuman_SUB_MINC, LikeHuman_SUB_MINC_HIPPO) )
 	os.system("mincmorph -clobber -successive DD %s %s" %(LikeHuman_SUB_MINC_HIPPO, LikeHuman_SUB_MINC_HIPPO) )
 	os.system("minccalc -byte -expr 'if(A[0]>0){out=1}else{out=A[1]}' %s %s %s" %(LikeHuman_SUB_MINC_HIPPO, LikeHuman_SEG_MINC, LikeHuman_SEG_MINC_exHippo) )
-
+	# out = wm_label
 	#sys.exit(1)
 		
   	INPUT_T1 = LikeHuman_T1_MINC
@@ -127,6 +127,8 @@ def main(opts, argv):
 	REFERENCE_MINC = CIVET_MINC_FINAL_PATH + 'stx_' + INPUT_FILE_NAME + '_t1_final.mnc'
 	TAL_XFM = CIVET_TRANSFORM_LINEAR + 'stx_' + INPUT_FILE_NAME + '_t1_tal.xfm'
 	
+	# Build Macaque PVE
+
 	os.system("mincresample -nearest -byte -like %s %s %s -transform %s" %(REFERENCE_MINC, ABC_SEG_MINC, RSL_ABC_SEG, TAL_XFM) )
 	os.system("minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){out=3}else if(A[0]>1.6 && A[0]<2.4){out=2}else if(A[0]>2.6 && A[0]<3.4){out=1}else if(A[0]>3.8 && A[0]<4.2){out=2}else{out=0}' %s %s" %(RSL_ABC_SEG, RSL_ABC_SEG2) )
 	TEMP_CSF = CIVET_CLASSIFY_PATH + 'tmp_exactCSF.mnc' 	
@@ -135,8 +137,8 @@ def main(opts, argv):
 	CSF_BIN_SKEL = CSF_BIN[:-4] + '_skel.mnc'
 	CSF_BIN_SKEL_DEF = CSF_BIN_SKEL[:-4] + '_defrag.mnc'
 	PVE_CG = CIVET_CLASSIFY_PATH + 'pve'
-	############## DONE ##########################
 	# Remove noise
+	# ACTUAL PROB VALUES USED HERE
 	os.system("minccalc -byte -expr 'if(A[0]>0.0 && A[1]>0){out=1}else{out=0}' %s %s %s" %(PVE_EXACTCSF, RSL_ABC_SEG2 ,CSF_BIN) )
 	os.system("mincmorph -dilation %s %s" %(CSF_BIN, CSF_BIN_DIL) )
 	os.system("skel %s %s" %(CSF_BIN_DIL, CSF_BIN_SKEL) )
@@ -150,8 +152,11 @@ def main(opts, argv):
 	os.system("minccalc -byte -expr 'if(A[0]>1.6 && A[0]<2.4){out=1}else{out=0}' %s %s" %(CLS_CLEAN,PVE_EXACTGM) )
 	os.system("minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){out=1}else{out=0}' %s %s" %(CLS_CLEAN,PVE_EXACTCSF) )
 
+	# Phase 2 = Change EM seg into civet pipeline
 	os.system("%sCIVET_Processing_Pipeline -input_is_stx -surfreg-model mmuMonkey -prefix %s -sourcedir ./ -targetdir ./ -N3-distance 200 -template 0.50 -lsq12 -resample-surfaces -thickness tlaplace:tfs:tlink 30:20 -combine-surface -animal -lobe_atlas icbm152nl-2009a -no-calibrate-white -reset-from cortical_masking -reset-to extract_white_surface_right -spawn -run %s > %s" %(CIVET_SCRIPT_PATH, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log'))
 
+	############## END OF PHASE 2 ##########################
+	
 	CIVET_SURF_PATH = CIVET_WORKING_PATH + 'surfaces/'
 	CIVET_TEMP_PATH = CIVET_WORKING_PATH + 'temp/'
 	SURF_LEFT_WM = CIVET_SURF_PATH + 'stx_' + INPUT_FILE_NAME + '_white_surface_left_81920.obj'
@@ -186,7 +191,15 @@ def main(opts, argv):
 	#os.system("rm %s" %(CIVET_TEMP_PATH + '*') )
 
 	#os.system("%sCIVET_Processing_Pipeline -prefix %s -sourcedir ./ -targetdir ./ -N3-distance 200 -lsq12 -resample-surfaces -thickness tlaplace:tfs:tlink 30:20 -combine-surface -animal -lobe_atlas icbm152nl-2009a -no-calibrate-white -reset-from cortical_masking -reset-to mid_surface_right -spawn -run %s > %s" %(CIVET_SCRIPT_PATH, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log'))
+
+
+	# Change EM tissue seg into input for CIVET pipeline
+
 	os.system("%sCIVET_Processing_Pipeline -input_is_stx -surfreg-model mmuMonkey -prefix %s -sourcedir ./ -targetdir ./ -N3-distance 200 -template 0.50 -lsq12 -resample-surfaces -thickness tlaplace:tfs:tlink 30:20 -combine-surface -animal -lobe_atlas icbm152nl-2009a -no-calibrate-white -reset-from surface_classify -reset-to mid_surface_right -spawn -run %s > %s" %(CIVET_SCRIPT_PATH, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log'))
+
+	###### Beginning of Phase 3 ################
+	###### Expand GM to CSF boundary ###########
+
 
 	### --> TEST
 	##### 2nd iteration for GM surface from GM surface
@@ -413,9 +426,10 @@ def main(opts, argv):
 	os.system("cp %s %s" %(UNC_EMPTY_LOG_FILE,LOG_GRAY_FULL) )
 	os.system("cp %s %s" %(UNC_EMPTY_LOG_FILE,LOG_GRAY_FULL_FIN) )		
 
+	######## Resuming civet pipeline --> surface registration  ########### 
 	os.system("%sCIVET_Processing_Pipeline -input_is_stx -surfreg-model mmuMonkey -prefix %s -sourcedir ./ -targetdir ./ -N3-distance 200 -template 0.50 -lsq12 -resample-surfaces -thickness tlaplace:tfs:tlink 30:20 -VBM -combine-surface -animal -lobe_atlas icbm152nl-2009a -hi-res-surfaces -no-calibrate-white -reset-after cls_volumes -spawn -run %s > %s" %(CIVET_SCRIPT_PATH, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log'))
-	
-	# Transform back to original space
+	######## Beginning of (Optional) Phase 4 #############
+	######## Transform back to original space ###########
 
 	TAL_XFM_INVERT = TAL_XFM[:-4] + '_invert.xfm'
 	os.system("xfminvert %s %s" %(TAL_XFM, TAL_XFM_INVERT) )

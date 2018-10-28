@@ -35,7 +35,7 @@ Will run the input string command as is in the shell
 def runsh(exec_str, **kwargs):
 	run(exec_str, **kwargs, shell=True)
 
-
+#TODO: Use separate folders for log files and ouput files --> read from param file
 
 def execute(args, params):
 	INPUT_FILE_NAME, LikeHuman_SEG_MINC_exHippo = phase1.execute(args, params)
