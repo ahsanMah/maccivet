@@ -11,8 +11,8 @@
 ######################################################################################################### 
 
 
-import argparse, os, re
-from subprocess import run
+import re
+from helpers import runsh
 
 #### Labels ####
 # WM = 1
@@ -22,15 +22,6 @@ from subprocess import run
 # HIPPO_R = 5
 ################
 
-
-'''
-Wrapper for the run function in the subprocess module
-Will run the input string command as is in the shell
-@Input: String to execute
-'''
-
-def runsh(exec_str, **kwargs):
-	run(exec_str, **kwargs, shell=True)
 
 '''
 Warps the Macaque brain image to a human template space
@@ -98,6 +89,7 @@ def execute(args, param_obj):
 	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = convertToHuman(args.t1_image, args.seg_label, args.sub_label)
 	# print(convertToHuman(args.t1_image, args.seg_label, args.sub_label))
 	print(LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC)
+
 	LikeHuman_SUB_MINC_HIPPO, LikeHuman_SEG_MINC_exHippo  = excludeHippo(LikeHuman_SUB_MINC, LikeHuman_SEG_MINC)
 
 	INPUT_T1 = LikeHuman_T1_MINC

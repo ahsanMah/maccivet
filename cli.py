@@ -1,7 +1,7 @@
 import argparse, os, re
 from subprocess import run
 
-import pipeline, configparser
+import pipeline, helpers
 
 '''
 Specifies all the arguments that the parser can take
@@ -31,9 +31,9 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	params = configparser.Parameters(args.paramfile)
+	params = helpers.ConfigParser(args.paramfile)
 
-	print(params.filepaths)
+	# print(params.filepaths)
 
 	verify_file(args.t1_image)
 	pipeline.execute(args, params)

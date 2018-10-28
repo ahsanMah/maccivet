@@ -26,15 +26,6 @@ HIPPO_R = 5
 ################
 
 
-'''
-Wrapper for the run function in the subprocess module
-Will run the input string command as is in the shell
-@Input: String to execute
-'''
-
-def runsh(exec_str, **kwargs):
-	run(exec_str, **kwargs, shell=True)
-
 #TODO: Use separate folders for log files and ouput files --> read from param file
 
 def execute(args, params):
