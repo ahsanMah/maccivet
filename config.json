@@ -16,6 +16,13 @@
 		"Transform_MonkeyToHuman": "/nas/longleaf/home/shykim/21-MONKEY/new_MonkeyToHuman.txt",
 
 		"Human_Template": "/nas/longleaf/home/shykim/21-MONKEY/mni_target_xyflip.nrrd"
+	},
+
+	"labels":{
+		"WM":1,
+		"GM":2,
+		"Hippo_L":1,
+		"Hippo_R":5
 	}
 
 }

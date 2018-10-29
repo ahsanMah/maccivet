@@ -10,6 +10,24 @@ Will run the input string command as is in the shell
 def runsh(exec_str, **kwargs):
 	run(exec_str, **kwargs, shell=True)
 
+class Labels(object):
+	"""
+	Stores label values for common brain regions as defined by the configuration file
+	IMPORTANT: The names of the variables will reflect those read from the configuration file
+	If a label is not declared below but is present in the config file, 
+	it will be dynamically added to this class with the same name as that in the config file 
+	"""
+	def __init__(self, labels_dict):
+		self.WM, self.GM, self.CSF = None, None, None
+		self.Hippo_L, self.Hippo_R = None, None
+		self.setLabels(labels_dict)
+	
+	#### If the label names change, update here ####
+	def setLabels(self, labels):
+		for region in labels:
+			label = int(labels[region])
+			setattr(self,region,label)
+
 class ConfigParser(object):
 	"""This class will read a JSON parameter file and build the necessary strings
 	   to be run in the command line
@@ -20,6 +38,7 @@ class ConfigParser(object):
 	CIVET = "CIVET"
 	CIVET_PATH = "CIVET_Path"
 	FILEPATHS = "file_paths"
+	LABELS = "labels"
 
 	def __init__(self, configfile):
 		# Dictionary of the parameters adn their values
@@ -29,11 +48,15 @@ class ConfigParser(object):
 		# Paths to various files used by the pipeline
 		self.filepaths = {}
 
+
 		with open(configfile,'r') as cf:
 			self.config = json.load(cf)
 
 		self.buildFilePaths()
 		self.buildCivetParams()
+
+		#Build labels
+		self.labels = Labels(self.config[ConfigParser.LABELS])
 
 
 	'''Accepts a type of paramter and builds the corresponding string
@@ -58,6 +81,9 @@ class ConfigParser(object):
 
 	def buildFilePaths(self):
 		self.filepaths = self.config[ConfigParser.FILEPATHS]
+
+	def buildLabels(self):
+		self.labels = self.config[ConfigParser.LABELS]
 
 class FileNames(object):
 	"""List of all the filenames to be used across phases

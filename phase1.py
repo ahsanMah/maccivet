@@ -90,6 +90,8 @@ def execute(args, param_obj):
 	global PARAMS 
 	PARAMS = param_obj
 
+	print("WM LABEL: ",PARAMS.labels.WM)
+
 	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = convertToHuman(args.t1_image, args.seg_label, args.sub_label)
 
 	print(LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC)
