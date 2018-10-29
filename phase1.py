@@ -15,16 +15,16 @@ import re
 from helpers import runsh
 
 #### Labels ####
-# WM = 1
-# GM = 2
+WM = 1
+GM = 2
 
 # HIPPO_L = 1
-# HIPPO_R = 5
+HIPPO_R = 5
 ################
 
 
 '''
-Warps the Macaque brain image to a human template space
+Registers the Macaque brain images to a human template space
 '''
 def convertToHuman(INPUT_T1, INPUT_SEG, INPUT_SUB):
 	CIVET_SCRIPT_PATH = '/proj/NIRAL/tools/CIVET/CIVETv2.1-longleaf/Linux-x86_64/CIVET-2.1.0/'
@@ -46,15 +46,15 @@ def convertToHuman(INPUT_T1, INPUT_SEG, INPUT_SUB):
 	return LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC
 
 '''
-Warps the Macaque brain image to the human template
+Warps a Macaque brain image to a human template
 '''
 def warpMonkeyImage(Input_Img):
-	##### TODO: SHOULD BE MADE AVILABLE VIA PARAMETER FILE ######
 	Transform_MonkeyToHuman = PARAMS.filepaths["Transform_MonkeyToHuman"]
 	Human_Template = PARAMS.filepaths["Human_Template"] ## MNI 0.5mm iso template 
 
 	LikeHuman = Input_Img.replace(".nrrd", '_LikeHuman.nrrd' )
-	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(Input_Img, LikeHuman, Human_Template, Transform_MonkeyToHuman) )
+	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(
+		   Input_Img, LikeHuman, Human_Template, Transform_MonkeyToHuman) )
 
 	## CIVET accepts MINC files so we need one last conversion
 	LikeHuman_MINC = LikeHuman.replace(".nrrd", '.mnc')
@@ -65,15 +65,19 @@ def warpMonkeyImage(Input_Img):
 def excludeHippo(LikeHuman_SUB_MINC, LikeHuman_SEG_MINC):
 	LikeHuman_SUB_MINC_HIPPO = LikeHuman_SUB_MINC.replace(".mnc", '_Hippo.mnc')
 	LikeHuman_SEG_MINC_exHippo = LikeHuman_SEG_MINC.replace(".mnc", '_excludeHippo.mnc')
-	# Convert Hippo into WM
-	# Note that the values (0.5,1.5,etc.) correspond to label values
-	# # so they can vary and should be predefined by user in param file 1=WM label in seg_minc
-	# runsh("minccalc -byte -expr 'if(A[0]>0.5 && A[0]<1.5 || A[0]>4.5 && A[0]<5.5 ){out=1}else{out=0}' %s %s" %(LikeHuman_SUB_MINC, LikeHuman_SUB_MINC_HIPPO) )
-	# runsh("mincmorph -clobber -successive DD {} {}".format(LikeHuman_SUB_MINC_HIPPO, LikeHuman_SUB_MINC_HIPPO) )
 	
-	# # If label is 1, in Hippo file, then it is WM in exHippo
-	# # o/w just label according to normal segemntation
-	# runsh("minccalc -byte -expr 'if(A[0]>0){out=1}else{out=A[1]}' {} {} {}".format(LikeHuman_SUB_MINC_HIPPO, LikeHuman_SEG_MINC, LikeHuman_SEG_MINC_exHippo) )
+	# Convert Hippo into WM
+	# Note that the values wm_low, wm_high etc. correspond to label values
+	# There is a bug in minc where it cannot compare integers, so a range of floats is required instead
+	# Recall labels can be predefined by user in configuration file
+	minc_cmd = "minccalc -byte -expr 'if(A[0]>{wm_low} && A[0]<{wm_high} || A[0]>{hippo_low} && A[0]<{hippo_high} ){{out=1}}else{{out=0}}'".format(
+		        wm_low=WM-0.5, wm_high=WM+0.5, hippo_low=HIPPO_R-0.5, hippo_high=HIPPO_R+0.5)
+	runsh(minc_cmd+ "{input} {output}".format(input=LikeHuman_SUB_MINC, output=LikeHuman_SUB_MINC_HIPPO) )
+	runsh("mincmorph -clobber -successive DD {input} {output}".format(input=LikeHuman_SUB_MINC_HIPPO, output=LikeHuman_SUB_MINC_HIPPO) )
+	
+	# Create file without the hippocampal region
+	runsh("minccalc -byte -expr 'if(A[0]>0){{out={wm}}}else{{out=A[1]}}' {hippo_only} {original_seg} {output}".format(
+		   wm=WM, hippo_only=LikeHuman_SUB_MINC_HIPPO, original_seg=LikeHuman_SEG_MINC, output=LikeHuman_SEG_MINC_exHippo) )
 
 	return LikeHuman_SUB_MINC_HIPPO, LikeHuman_SEG_MINC_exHippo
 
@@ -87,7 +91,7 @@ def execute(args, param_obj):
 	PARAMS = param_obj
 
 	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = convertToHuman(args.t1_image, args.seg_label, args.sub_label)
-	# print(convertToHuman(args.t1_image, args.seg_label, args.sub_label))
+
 	print(LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC)
 
 	LikeHuman_SUB_MINC_HIPPO, LikeHuman_SEG_MINC_exHippo  = excludeHippo(LikeHuman_SUB_MINC, LikeHuman_SEG_MINC)
@@ -99,15 +103,16 @@ def execute(args, param_obj):
 	suffix = "_t1.mnc"
 	if INPUT_T1.endswith(suffix) and INPUT_T1.startswith(prefix):
 		exp = "^({})(.*)({})$".format(prefix, suffix)
-		INPUT_FILE_NAME = re.match(exp, INPUT_T1).group(2)
+		stx_input = re.match(exp, INPUT_T1).group(2)
 	else:
 		exp = "(.*)(\.mnc)$"
-		INPUT_FILE_NAME = re.match(exp, INPUT_T1).group(1)
-		ReINPUT_T1 = prefix + INPUT_FILE_NAME + suffix
+		stx_input = re.match(exp, INPUT_T1).group(1)
+		ReINPUT_T1 = prefix + stx_input + suffix
 		runsh("cp %s %s" %(INPUT_T1, ReINPUT_T1) )
 
 	# RUN CIVET
-	CIVET_Config = "{0} -prefix {1} -reset-to pve -spawn -run {2} > {3}".format(PARAMS.civet, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log') 
-	# runsh("%sCIVET_Processing_Pipeline -input_is_stx -surfreg-model mmuMonkey -prefix %s -sourcedir ./ -targetdir ./ -N3-distance 200 -template 0.50 -lsq12 -resample-surfaces -thickness tlaplace:tfs:tlink 30:20 -combine-surface -animal -lobe_atlas icbm152nl-2009a -no-calibrate-white -reset-to pve -spawn -run %s > %s" %(CIVET_SCRIPT_PATH, prefix, INPUT_FILE_NAME, INPUT_FILE_NAME+'_log'))
-	print(CIVET_Config)
-	return INPUT_FILE_NAME, LikeHuman_SEG_MINC_exHippo
+	CIVET_cmd = "{civet_params} -prefix {input_type} -reset-to pve -spawn -run {input_file} > {log_file}".format(
+		        civet_params=PARAMS.civet, input_type=prefix, input_file=stx_input, log_file=stx_input+'_log') 
+
+	runsh(CIVET_cmd)
+	return stx_input, LikeHuman_SEG_MINC_exHippo
