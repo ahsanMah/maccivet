@@ -29,6 +29,8 @@ HIPPO_R = 5
 #TODO: Use separate folders for log files and ouput files --> read from param file
 
 def execute(args, params):
-	INPUT_FILE_NAME, LikeHuman_SEG_MINC_exHippo = phase1.execute(args, params)
+	STX_Input_T1, LikeHuman_SEG_MINC_exHippo = phase1.execute(args, params)
 
-	phase2.execute(INPUT_FILE_NAME)
+	phase2.execute(STX_Input_T1, LikeHuman_SEG_MINC_exHippo, params)
+
+	# phase3.execute(STX_Input_T1)

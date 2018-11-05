@@ -1,20 +1,15 @@
 ### Second Phase of the processing pipeline
-import os, helpers
+### It is mainly responsible for calculating PVEs specific to Macaque brains
+
+import os
+from helpers import runsh
+from helpers import FileNames
+
 Current_dir = os.getcwd() + '/'
-
-'''
-Wrapper for the run function in the subprocess module
-Will run the input string command as is in the shell
-@Input: String to execute
-'''
-
-def runsh(exec_str, **kwargs):
-	run(exec_str, **kwargs, shell=True)
-
 
 def buildFileNames(INPUT_FILE_NAME):
 
-	files = helpers.FileNames() 
+	files = FileNames() 
 
 	files.CIVET_WORKING_PATH = Current_dir +  INPUT_FILE_NAME + '/'
 	files.CIVET_CLASSIFY_PATH = files.CIVET_WORKING_PATH + 'classify/'
@@ -30,6 +25,9 @@ def buildFileNames(INPUT_FILE_NAME):
 	files.PVE_EXACTGM  = files.CIVET_CLASSIFY_PATH + 'stx_' + INPUT_FILE_NAME + '_pve_exactgm.mnc'
 	files.PVE_EXACTWM  = files.CIVET_CLASSIFY_PATH + 'stx_' + INPUT_FILE_NAME + '_pve_exactwm.mnc'
 	
+	files.setFilePath("REFERENCE_MINC", files.CIVET_MINC_FINAL_PATH + 'stx_' + INPUT_FILE_NAME + '_t1_final.mnc')
+	files.setFilePath("TAL_XFM", files.CIVET_TRANSFORM_LINEAR + 'stx_' + INPUT_FILE_NAME + '_t1_tal.xfm')
+
 	return files
 
 def cleanupFiles(files):
@@ -38,36 +36,66 @@ def cleanupFiles(files):
 	runsh("rm {} {} {} {} {}".format(files.CLS_CLEAN, files.PVE_CLASSIFY, 
 								files.PVE_DISC , files.PVE_EXACTGM , files.PVE_EXACTWM) )
 
-def recalculatePVE():
-	REFERENCE_MINC = CIVET_MINC_FINAL_PATH + 'stx_' + INPUT_FILE_NAME + '_t1_final.mnc'
-	TAL_XFM = CIVET_TRANSFORM_LINEAR + 'stx_' + INPUT_FILE_NAME + '_t1_tal.xfm'
+def recalculatePVE(LikeHuman_SEG_MINC_exHippo,files):
+
+	ABC_SEG_MINC = LikeHuman_SEG_MINC_exHippo
+	runsh("mincresample -nearest -byte -like {} {} {} -transform {}".format(
+		files.REFERENCE_MINC, ABC_SEG_MINC, files.RSL_ABC_SEG, files.TAL_XFM) )
 	
-	runsh("mincresample -nearest -byte -like %s %s %s -transform %s" %(REFERENCE_MINC, ABC_SEG_MINC, RSL_ABC_SEG, TAL_XFM) )
-	runsh("minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){out=3}else if(A[0]>1.6 && A[0]<2.4){out=2}else if(A[0]>2.6 && A[0]<3.4){out=1}else if(A[0]>3.8 && A[0]<4.2){out=2}else{out=0}' %s %s" %(RSL_ABC_SEG, RSL_ABC_SEG2) )
+	# minc_cmd = "minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){out=3}else if(A[0]>1.6 && A[0]<2.4){out=2}else if(A[0]>2.6 && A[0]<3.4){out=1}else if(A[0]>3.8 && A[0]<4.2){out=2}else{out=0}'"
+
+	minc_cmd = "minccalc -byte -expr 'if(A[0]>{wm_low} && A[0]<{wm_high}){{out=3}}else if(A[0]>{gm_low} && A[0]<{gm_high}){{out=2}}else if(A[0]>{csf_low} && A[0]<{csf_high}){{out=1}}else if(A[0]>{thal_low} && A[0]<{thal_high}){{out=2}}else{{out=0}}'".format(
+			wm_low    = labels.WM - 0.4,
+			wm_high   = labels.WM + 0.4,
+			csf       = labels.CSF,
+			gm_low    = labels.GM - 0.4,
+			gm_high   = labels.GM + 0.4,
+			gm        = labels.GM,
+			csf_low   = labels.CSF - 0.4,
+			csf_high  = labels.CSF + 0.4,
+			thal_low  = labels.Thal - 0.2,
+			thal_high = labels.Thal + 0.2 
+		)
+	runsh(minc_cmd + "{} {}".format(files.RSL_ABC_SEG, files.RSL_ABC_SEG2) )
+	
 	TEMP_CSF = files.CIVET_CLASSIFY_PATH + 'tmp_exactCSF.mnc' 	
-	CSF_BIN = PVE_EXACTCSF[:-4] + '_binary.mnc'
+	CSF_BIN = files.PVE_EXACTCSF[:-4] + '_binary.mnc'
 	CSF_BIN_DIL = CSF_BIN[:-4] + '_dil.mnc'
 	CSF_BIN_SKEL = CSF_BIN[:-4] + '_skel.mnc'
 	CSF_BIN_SKEL_DEF = CSF_BIN_SKEL[:-4] + '_defrag.mnc'
-	PVE_CG = CIVET_CLASSIFY_PATH + 'pve'
+	PVE_CG = files.CIVET_CLASSIFY_PATH + 'pve'
 
 	# Remove noise
-	runsh("minccalc -byte -expr 'if(A[0]>0.0 && A[1]>0){out=1}else{out=0}' %s %s %s" %(PVE_EXACTCSF, RSL_ABC_SEG2 ,CSF_BIN) )
-	runsh("mincmorph -dilation %s %s" %(CSF_BIN, CSF_BIN_DIL) )
-	runsh("skel %s %s" %(CSF_BIN_DIL, CSF_BIN_SKEL) )
-	runsh("minccalc -byte -expr 'if( (A[0]>0.8 && A[0]<1.2) || A[1]>0){out=1}else{out=0}' %s %s %s" %(RSL_ABC_SEG2, CSF_BIN_SKEL, TEMP_CSF) )
-	runsh("mincdefrag %s %s 1 27" %(TEMP_CSF, CSF_BIN_SKEL_DEF) )
-	runsh("minccalc -byte -expr 'if(A[0]>0 && A[1]==2){out=1}else{out=A[1]}' %s %s %s" %(CSF_BIN_SKEL_DEF, RSL_ABC_SEG2, CLS_CLEAN) )
-	runsh("rm %s" %(PVE_EXACTCSF) )
-	runsh("cp %s %s" %(CLS_CLEAN,PVE_CLASSIFY) )
-	runsh("cp %s %s" %(CLS_CLEAN,PVE_DISC) )
-	runsh("minccalc -byte -expr 'if(A[0]>2.6 && A[0]<3.4){out=1}else{out=0}' %s %s" %(CLS_CLEAN,PVE_EXACTWM) )
-	runsh("minccalc -byte -expr 'if(A[0]>1.6 && A[0]<2.4){out=1}else{out=0}' %s %s" %(CLS_CLEAN,PVE_EXACTGM) )
-	runsh("minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){out=1}else{out=0}' %s %s" %(CLS_CLEAN,PVE_EXACTCSF) )
+	runsh("minccalc -byte -expr 'if(A[0]>0.0 && A[1]>0){{out=1}}else{{out=0}}' {} {} {}".format(files.PVE_EXACTCSF, files.RSL_ABC_SEG2, CSF_BIN) )
+	runsh("mincmorph -dilation {} {}".format(CSF_BIN, CSF_BIN_DIL) )
+	runsh("skel {} {}".format(CSF_BIN_DIL, CSF_BIN_SKEL) )
+	runsh("minccalc -byte -expr 'if( (A[0]>0.8 && A[0]<1.2) || A[1]>0){{out=1}}else{{out=0}}' {} {} {}".format(files.RSL_ABC_SEG2, CSF_BIN_SKEL, TEMP_CSF) )
+	runsh("mincdefrag {} {} 1 27".format(TEMP_CSF, CSF_BIN_SKEL_DEF) )
+	runsh("minccalc -byte -expr 'if(A[0]>0 && A[1]==2){{out=1}}else{{out=A[1]}}' {} {} {}".format(CSF_BIN_SKEL_DEF, files.RSL_ABC_SEG2, files.CLS_CLEAN) )
+	runsh("rm {}".format(files.PVE_EXACTCSF) )
+	runsh("cp {} {}".format(files.CLS_CLEAN, files.PVE_CLASSIFY) )
+	runsh("cp {} {}".format(files.CLS_CLEAN, files.PVE_DISC) )
+	runsh("minccalc -byte -expr 'if(A[0]>2.6 && A[0]<3.4){{out=1}}else{{out=0}}' {} {}".format(files.CLS_CLEAN, files.PVE_EXACTWM) )
+	runsh("minccalc -byte -expr 'if(A[0]>1.6 && A[0]<2.4){{out=1}}else{{out=0}}' {} {}".format(files.CLS_CLEAN, files.PVE_EXACTGM) )
+	runsh("minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){{out=1}}else{{out=0}}' {} {}".format(files.CLS_CLEAN, files.PVE_EXACTCSF) )
 
-def execute(INPUT_T1):
+def execute(INPUT_T1, LikeHuman_SEG_MINC_exHippo, parameters):
 	print('''==================================\nBeginning Phase 2\n==================================''')
+
+	global labels
+	labels = parameters.labels
 
 	files = buildFileNames(INPUT_T1)
 	print(files)
+
+	cleanupFiles(files)
+	recalculatePVE(LikeHuman_SEG_MINC_exHippo,files)
+
+	# RUN CIVET
+	CIVET_cmd = "{civet_params} -reset-from cortical_masking -reset-to extract_white_surface_right -spawn -run {input_file} > {log_file}".format(
+		        civet_params=parameters.civet, input_file=INPUT_T1, log_file=INPUT_T1+'_log')
+	
+	runsh(CIVET_cmd)
+	# print(parameters.civet)
+	return files
 

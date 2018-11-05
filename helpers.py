@@ -87,7 +87,6 @@ class ConfigParser(object):
 
 class FileNames(object):
 	"""List of all the filenames to be used across phases
-		TODO: PUT INTO MAIN PIPELINE FILE
 	"""
 	def __init__(self):
 		self.CIVET_WORKING_PATH = None
@@ -104,5 +103,16 @@ class FileNames(object):
 		self.PVE_EXACTGM  = None
 		self.PVE_EXACTWM  = None
 
+	def setFilePath(self,filename, path):
+		setattr(self,filename, path)
+
 	def __str__(self):
 		return "Parent Directory: {}".format(self.CIVET_WORKING_PATH)
+
+
+
+
+
+
+
+

@@ -40,8 +40,8 @@ def convertToHuman(INPUT_T1, INPUT_SEG, INPUT_SUB):
 Warps a Macaque brain image to a human template
 '''
 def warpMonkeyImage(Input_Img):
-	Transform_MonkeyToHuman = PARAMS.filepaths["Transform_MonkeyToHuman"]
-	Human_Template = PARAMS.filepaths["Human_Template"] ## MNI 0.5mm iso template 
+	Transform_MonkeyToHuman = Params.filepaths["Transform_MonkeyToHuman"]
+	Human_Template = Params.filepaths["Human_Template"] ## MNI 0.5mm iso template 
 
 	LikeHuman = Input_Img.replace(".nrrd", '_LikeHuman.nrrd' )
 	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(
@@ -82,7 +82,8 @@ Entry point for executing the modified CIVET pipeline
 def execute(args, parameters):
 	print('''==================================\nBeginning Phase 1\n==================================''')
 	
-	global labels
+	global Params, labels
+	Params = parameters
 	labels = parameters.labels
 
 	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = convertToHuman(args.t1_image, args.seg_label, args.sub_label)
@@ -106,8 +107,8 @@ def execute(args, parameters):
 		runsh("cp %s %s" %(INPUT_T1, ReINPUT_T1) )
 
 	# RUN CIVET
-	CIVET_cmd = "{civet_params} -prefix {input_type} -reset-to pve -spawn -run {input_file} > {log_file}".format(
-		        civet_params=parameters.civet, input_type=prefix, input_file=stx_input, log_file=stx_input+'_log') 
+	CIVET_cmd = "{civet_params} -reset-to pve -spawn -run {input_file} > {log_file}".format(
+		        civet_params=parameters.civet, input_file=stx_input, log_file=stx_input+'_log') 
 
 	runsh(CIVET_cmd)
 	return stx_input, LikeHuman_SEG_MINC_exHippo
