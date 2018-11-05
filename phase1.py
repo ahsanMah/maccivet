@@ -14,15 +14,6 @@
 import re
 from helpers import runsh
 
-#### Labels ####
-WM = 1
-GM = 2
-
-# HIPPO_L = 1
-HIPPO_R = 5
-################
-
-
 '''
 Registers the Macaque brain images to a human template space
 '''
@@ -70,14 +61,17 @@ def excludeHippo(LikeHuman_SUB_MINC, LikeHuman_SEG_MINC):
 	# Note that the values wm_low, wm_high etc. correspond to label values
 	# There is a bug in minc where it cannot compare integers, so a range of floats is required instead
 	# Recall labels can be predefined by user in configuration file
-	minc_cmd = "minccalc -byte -expr 'if(A[0]>{wm_low} && A[0]<{wm_high} || A[0]>{hippo_low} && A[0]<{hippo_high} ){{out=1}}else{{out=0}}'".format(
-		        wm_low=WM-0.5, wm_high=WM+0.5, hippo_low=HIPPO_R-0.5, hippo_high=HIPPO_R+0.5)
+	minc_cmd = "minccalc -byte -expr 'if(A[0]>{lhippo_low} && A[0]<{lhippo_high} || A[0]>{rhippo_low} && A[0]<{rhippo_high} ){{out=1}}else{{out=0}}'".format(
+		        lhippo_low  = labels.Hippo_L-0.5,
+		        lhippo_high = labels.Hippo_R+0.5,
+		        rhippo_low  = labels.Hippo_R-0.5,
+		        rhippo_high = labels.Hippo_R+0.5)
 	runsh(minc_cmd+ "{input} {output}".format(input=LikeHuman_SUB_MINC, output=LikeHuman_SUB_MINC_HIPPO) )
 	runsh("mincmorph -clobber -successive DD {input} {output}".format(input=LikeHuman_SUB_MINC_HIPPO, output=LikeHuman_SUB_MINC_HIPPO) )
 	
 	# Create file without the hippocampal region
 	runsh("minccalc -byte -expr 'if(A[0]>0){{out={wm}}}else{{out=A[1]}}' {hippo_only} {original_seg} {output}".format(
-		   wm=WM, hippo_only=LikeHuman_SUB_MINC_HIPPO, original_seg=LikeHuman_SEG_MINC, output=LikeHuman_SEG_MINC_exHippo) )
+		   wm=labels.WM, hippo_only=LikeHuman_SUB_MINC_HIPPO, original_seg=LikeHuman_SEG_MINC, output=LikeHuman_SEG_MINC_exHippo) )
 
 	return LikeHuman_SUB_MINC_HIPPO, LikeHuman_SEG_MINC_exHippo
 
@@ -85,12 +79,11 @@ def excludeHippo(LikeHuman_SUB_MINC, LikeHuman_SEG_MINC):
 '''
 Entry point for executing the modified CIVET pipeline
 '''
-def execute(args, param_obj):
-
-	global PARAMS 
-	PARAMS = param_obj
-
-	print("WM LABEL: ",PARAMS.labels.WM)
+def execute(args, parameters):
+	print('''==================================\nBeginning Phase 1\n==================================''')
+	
+	global labels
+	labels = parameters.labels
 
 	LikeHuman_T1_MINC, LikeHuman_SEG_MINC, LikeHuman_SUB_MINC = convertToHuman(args.t1_image, args.seg_label, args.sub_label)
 
@@ -114,7 +107,7 @@ def execute(args, param_obj):
 
 	# RUN CIVET
 	CIVET_cmd = "{civet_params} -prefix {input_type} -reset-to pve -spawn -run {input_file} > {log_file}".format(
-		        civet_params=PARAMS.civet, input_type=prefix, input_file=stx_input, log_file=stx_input+'_log') 
+		        civet_params=parameters.civet, input_type=prefix, input_file=stx_input, log_file=stx_input+'_log') 
 
 	runsh(CIVET_cmd)
 	return stx_input, LikeHuman_SEG_MINC_exHippo
