@@ -1,4 +1,4 @@
-import phase1, phase2
+import phase1, phase2, phase3
 
 ######
 # This file acts as a wrapper to run all the different phases in the pipeline in order.
@@ -31,6 +31,6 @@ HIPPO_R = 5
 def execute(args, params):
 	STX_Input_T1, LikeHuman_SEG_MINC_exHippo = phase1.execute(args, params)
 
-	phase2.execute(STX_Input_T1, LikeHuman_SEG_MINC_exHippo, params)
+	files = phase2.execute(STX_Input_T1, LikeHuman_SEG_MINC_exHippo, params)
 
-	# phase3.execute(STX_Input_T1)
+	phase3.execute(STX_Input_T1, files, params)

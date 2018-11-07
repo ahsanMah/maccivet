@@ -1,6 +1,4 @@
 import argparse, os, re
-from subprocess import run
-
 import pipeline, helpers
 
 '''
@@ -21,7 +19,6 @@ def make_parser():
 def verify_file(fname):
 	if not os.path.isfile(fname):
 		raise FileNotFoundError("File \'{}\' does not exist".format(fname))
-
 
 
 
