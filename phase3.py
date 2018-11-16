@@ -35,6 +35,7 @@ def convert(files, INPUT_FILE_NAME):
 	runsh("minccalc -clobber -byte -expr 'if(A[0]>0.6 && A[0]<1.4){out=1}else{out=0}' %s %s" %(files.CLS_CLEAN, files.PVE_EXACTCSF) )
 
 def execute(STX_INPUT_T1, files, parameters):
+	print('''==================================\nBeginning Phase 3\n==================================''')
 
 	# Change EM tissue seg into input for CIVET pipeline
 	convert(files, STX_INPUT_T1)

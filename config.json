@@ -2,7 +2,8 @@
 	"CIVET":{
 		"flags": ["-input_is_stx","-lsq12","-resample-surfaces","-combine-surface","-animal","-no-calibrate-white"],
 		"-sourcedir":"./",
-		"-targetdir": "./", 
+		"-targetdir": "./",
+		"-prefix":"stx",
 		"-N3-distance": 200,
 		"-template": 0.50,
 		"-surfreg-model": "mmuMonkey",
@@ -15,12 +16,21 @@
 
 		"Transform_MonkeyToHuman": "/nas/longleaf/home/shykim/21-MONKEY/new_MonkeyToHuman.txt",
 
-		"Human_Template": "/nas/longleaf/home/shykim/21-MONKEY/mni_target_xyflip.nrrd"
+		"Human_Template": "/nas/longleaf/home/shykim/21-MONKEY/mni_target_xyflip.nrrd",
+		
+		"Temporal_Masks_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1/Linux-x86_64/share/mni-models/",
+
+		"Temporal_Tip_Mask" : "TEMPORAL_MASK_avg152lin.mnc",
+
+		"Midline_Mask" : "UNC_MiddleLine_Mask_Monkey.mnc"
 	},
 
 	"labels":{
 		"WM":1,
 		"GM":2,
+		"CSF":3,
+		"Thal":4,
+		"GP":5,
 		"Hippo_L":1,
 		"Hippo_R":5
 	}

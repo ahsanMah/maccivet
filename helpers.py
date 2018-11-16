@@ -28,6 +28,14 @@ class Labels(object):
 			label = int(labels[region])
 			setattr(self,region,label)
 
+class FilePaths(object):
+	"""
+	Stores path names stored on config file
+	"""
+	def __init__(self, filepaths):
+		for path in filepaths:
+			setattr(self,path,filepaths[path])
+
 class ConfigParser(object):
 	"""This class will read a JSON parameter file and build the necessary strings
 	   to be run in the command line
@@ -46,17 +54,19 @@ class ConfigParser(object):
 		# The CIVET command line arguments
 		self.civet = {}
 		# Paths to various files used by the pipeline
-		self.filepaths = {}
+		self.filepaths = None
 
 
 		with open(configfile,'r') as cf:
 			self.config = json.load(cf)
 
-		self.buildFilePaths()
-		self.buildCivetParams()
+		#Build filepath object
+		self.filepaths = FilePaths(self.config[ConfigParser.FILEPATHS])
 
 		#Build labels
 		self.labels = Labels(self.config[ConfigParser.LABELS])
+
+		self.buildCivetParams()
 
 
 	'''Accepts a type of paramter and builds the corresponding string
@@ -75,15 +85,9 @@ class ConfigParser(object):
 		args = " ".join([concat(p,params[p]) for p in params])
 
 		final_str = "{}/CIVET_Processing_Pipeline {} {}".format(
-			self.filepaths[ConfigParser.CIVET_PATH], flag_str, args)
+			self.filepaths.CIVET_Path, flag_str, args)
 
 		self.civet = final_str
-
-	def buildFilePaths(self):
-		self.filepaths = self.config[ConfigParser.FILEPATHS]
-
-	def buildLabels(self):
-		self.labels = self.config[ConfigParser.LABELS]
 
 class FileNames(object):
 	"""List of all the filenames to be used across phases

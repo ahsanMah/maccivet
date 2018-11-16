@@ -40,8 +40,8 @@ def convertToHuman(INPUT_T1, INPUT_SEG, INPUT_SUB):
 Warps a Macaque brain image to a human template
 '''
 def warpMonkeyImage(Input_Img):
-	Transform_MonkeyToHuman = Params.filepaths["Transform_MonkeyToHuman"]
-	Human_Template = Params.filepaths["Human_Template"] ## MNI 0.5mm iso template 
+	Transform_MonkeyToHuman = Params.filepaths.Transform_MonkeyToHuman
+	Human_Template = Params.filepaths.Human_Template ## MNI 0.5mm iso template 
 
 	LikeHuman = Input_Img.replace(".nrrd", '_LikeHuman.nrrd' )
 	runsh("BRAINSResample --inputVolume {} --outputVolume {} --referenceVolume {} --warpTransform {} --interpolationMode NearestNeighbor".format(

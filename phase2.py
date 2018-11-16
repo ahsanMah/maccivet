@@ -1,5 +1,7 @@
+######################################################################################################### 
 ### Second Phase of the processing pipeline
 ### It is mainly responsible for calculating PVEs specific to Macaque brains
+######################################################################################################### 
 
 import os
 from helpers import runsh
