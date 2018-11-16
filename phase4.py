@@ -74,7 +74,8 @@ def runSecondIter(Stx_Input_T1, files, parameters):
 	WMGM_DDDEEE = WMGM[:-4] + '_DDDEEE.mnc'
 	WMGM_DDDEEEEEEEE = WMGM[:-4] + '_DDDEEEEEEEE.mnc'
 	THIN_MASK = TEMP_PATH_2nd + 'thin_mask.mnc'
-	runsh("minccalc -expr 'if(A[0]>1.8){{out=1}}else{{out=0}}' {} {}".format(TEMP_FINAL_CLASSIFY,WMGM) ) 
+	runsh("minccalc -expr 'if(A[0]>{gm}){{out=1}}else{{out=0}}' {} {}".format(
+		  TEMP_FINAL_CLASSIFY, WMGM, gm=labels.GM - 0.2 ) ) 
 	runsh("mincmorph -successive DDDEEE {} {}".format(WMGM, WMGM_DDDEEE) )	
 	runsh("mincmorph -successive DDDEEEEEEEE {} {}".format(WMGM, WMGM_DDDEEEEEEEE) ) 
 	runsh("minccalc -byte -expr 'out=A[0]-A[1]' {} {} {}".format(WMGM_DDDEEE, WMGM_DDDEEEEEEEE, THIN_MASK) )
@@ -88,7 +89,7 @@ def runSecondIter(Stx_Input_T1, files, parameters):
 	CLS_2ND_TEMP2 = TEMP_PATH_2nd + 'CSL_2ND_temp2.mnc'
 	CLS_2ND_TEMP3 = TEMP_PATH_2nd + 'CSL_2ND_temp3.mnc'
 	CLS_2ND_TEMP4 = TEMP_PATH_2nd + 'CSL_2ND_temp4.mnc'
-	runsh("minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){out=3}else if(A[0]>1.6 && A[0]<2.4){{out=1}}else if(A[0]>2.6 && A[0]< 5.4){{out=3}}else if(A[1]>0 && A[2]==1){{out=1}}else{{out=A[3]}}' {} {} {} {} {}".format(TEMP_SUB_MASK, DEEP_DEFRAG, TEMP_FINAL_CLASSIFY, RSL_ABC_SEG2,  CLS_2ND_TEMP) )
+	runsh("minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){{out=3}}else if(A[0]>1.6 && A[0]<2.4){{out=1}}else if(A[0]>2.6 && A[0]< 5.4){{out=3}}else if(A[1]>0 && A[2]==1){{out=1}}else{{out=A[3]}}' {} {} {} {} {}".format(TEMP_SUB_MASK, DEEP_DEFRAG, TEMP_FINAL_CLASSIFY, files.RSL_ABC_SEG2,  CLS_2ND_TEMP) )
 	runsh("minccalc -byte -expr 'if(A[0]>0 && A[1]>0){{out=2}}else{{out=A[2]}}' {} {} {} {}".format(THIN_MASK, TEMP_CSF_SKEL, CLS_2ND_TEMP, CLS_2ND_TEMP2) )
 	
 	WM_2ND_LEFT = TEMP_PATH_2nd + 'wm_2nd_mask_left.mnc'
@@ -101,17 +102,17 @@ def runSecondIter(Stx_Input_T1, files, parameters):
 	runsh("surface_mask2 -binary_mask {} {} {}".format(CLS_2ND_TEMP2, SURF_RIGHT_MID, WM_2ND_RIGHT) )
 	runsh("mincmorph -successive DD {} {}".format(WM_2ND_LEFT, WM_2ND_LEFT_DD) )
 	runsh("mincmorph -successive DD {} {}".format(WM_2ND_RIGHT, WM_2ND_RIGHT_DD) )
-	runsh("minccalc -byte -expr 'if(A[0]>0 || A[1]>0){out=1}else{out=0}' {} {} {}".format(WM_2ND_LEFT, WM_2ND_RIGHT, WM_2ND) )
-	runsh("minccalc -byte -expr 'if(A[0]>0 || A[1]>0){out=1}else{out=0}' {} {} {}".format(WM_2ND_LEFT_DD, WM_2ND_RIGHT_DD, WM_2ND_DD) )
+	runsh("minccalc -byte -expr 'if(A[0]>0 || A[1]>0){{out=1}}else{{out=0}}' {} {} {}".format(WM_2ND_LEFT, WM_2ND_RIGHT, WM_2ND) )
+	runsh("minccalc -byte -expr 'if(A[0]>0 || A[1]>0){{out=1}}else{{out=0}}' {} {} {}".format(WM_2ND_LEFT_DD, WM_2ND_RIGHT_DD, WM_2ND_DD) )
 	
-	runsh("minccalc -byte -expr 'if(A[0]>0){out=3}else if(A[1]>0 && A[2]==1){out=1}else if(A[2]==2){out=2}else if(A[3]>0){out=2}else{out=A[2]}' {} {} {} {} {}".format(WM_2ND, WM_2ND_DD, CLS_2ND_TEMP2,WMGM_DDDEEE, CLS_2ND_TEMP3) )  
+	runsh("minccalc -byte -expr 'if(A[0]>0){{out=3}}else if(A[1]>0 && A[2]==1){{out=1}}else if(A[2]==2){{out=2}}else if(A[3]>0){{out=2}}else{{out=A[2]}}' {} {} {} {} {}".format(WM_2ND, WM_2ND_DD, CLS_2ND_TEMP2,WMGM_DDDEEE, CLS_2ND_TEMP3) )  
 
-	runsh("minccalc -byte -expr 'if(A[0]>0 && A[1]==1){out=1}else{out=A[2]}' {} {} {} {}".format(MID_LINE_MASK, CLS_2ND_TEMP2, CLS_2ND_TEMP3, CLS_2ND_TEMP4) )
+	runsh("minccalc -byte -expr 'if(A[0]>0 && A[1]==1){{out=1}}else{{out=A[2]}}' {} {} {} {}".format(MID_LINE_MASK, CLS_2ND_TEMP2, CLS_2ND_TEMP3, CLS_2ND_TEMP4) )
 	CLS_2ND_TEMP2_CSF = CLS_2ND_TEMP2[:-4] + '_CSF.mnc'
 	CLS_2ND_TEMP2_CSF_ED = CLS_2ND_TEMP2_CSF[:-4] + '_ED.mnc'
-	runsh("minccalc -byte -expr 'if(A[0]>0 && A[0]<1.2){out=1}else{out=0}' {} {}".format(CLS_2ND_TEMP2, CLS_2ND_TEMP2_CSF) )
+	runsh("minccalc -byte -expr 'if(A[0]>0 && A[0]<1.2){{out=1}}else{{out=0}}' {} {}".format(CLS_2ND_TEMP2, CLS_2ND_TEMP2_CSF) )
 	runsh("mincmorph -successive ED {} {}".format(CLS_2ND_TEMP2_CSF, CLS_2ND_TEMP2_CSF_ED) )	
-	runsh("minccalc -byte -expr 'if(A[0]>0){out=1}else{out=A[1]}' {} {} {}".format(CLS_2ND_TEMP2_CSF_ED, CLS_2ND_TEMP4, CLS_2ND) )
+	runsh("minccalc -byte -expr 'if(A[0]>0){{out=1}}else{{out=A[1]}}' {} {} {}".format(CLS_2ND_TEMP2_CSF_ED, CLS_2ND_TEMP4, CLS_2ND) )
 
 
 
@@ -120,7 +121,7 @@ def execute(Stx_Input_T1, files, parameters):
 	
 	global labels
 	labels = parameters.labels
-	
+
 	runSecondIter(Stx_Input_T1, files, parameters)
 	
 	###### make laplace grid ########
@@ -128,10 +129,10 @@ def execute(Stx_Input_T1, files, parameters):
 	CLS_2ND_CSF_SKEL = TEMP_PATH_2nd + 'CLS_2ND_CSF_SKEL.mnc'
 	SKULL_MASK = TEMP_PATH_2nd + 'skull_mask.mnc'
 	PVE_GM_2ND = TEMP_PATH_2nd + 'pve_gm.mnc'
-	runsh("minccalc -byte -expr 'if(A[0]==1){out=1}else{out=0}' {} {}".format(CLS_2ND, CLS_2ND_CSF) )
+	runsh("minccalc -byte -expr 'if(A[0]==1){{out=1}}else{{out=0}}' {} {}".format(CLS_2ND, CLS_2ND_CSF) )
 	runsh("skel {} {}".format(CLS_2ND_CSF, CLS_2ND_CSF_SKEL) )
-	runsh("minccalc -byte -expr 'if(A[0]>0){out=1}else{out=0}' {} {}".format(CLS_2ND, SKULL_MASK) )
-	runsh("minccalc -byte -expr 'if(A[0]>1.5 && A[0]<2.5){out=1}else{out=0}' {} {}".format(CLS_2ND, PVE_GM_2ND) )
+	runsh("minccalc -byte -expr 'if(A[0]>0){{out=1}}else{{out=0}}' {} {}".format(CLS_2ND, SKULL_MASK) )
+	runsh("minccalc -byte -expr 'if(A[0]>1.5 && A[0]<2.5){{out=1}}else{{out=0}}' {} {}".format(CLS_2ND, PVE_GM_2ND) )
 	#runsh("make_asp_grid {} {} {} {} {} {} {} {}".format(files.REFERENCE_MINC, CLS_2ND_CSF_SKEL, SURF_LEFT_MID, SURF_RIGHT_MID, CLS_2ND, WM_2ND, TEMP_FINAL_CALLOSUM, OUT_FIELD ) )
 	runsh("make_asp_grid {} {} {} {} {} {} {} {} {} {}".format(files.REFERENCE_MINC, SKULL_MASK, CLS_2ND_CSF_SKEL,  SURF_LEFT_MID, SURF_RIGHT_MID, CLS_2ND, PVE_GM_2ND, CLS_2ND, TEMP_FINAL_CALLOSUM, OUT_FIELD ) )
 	
