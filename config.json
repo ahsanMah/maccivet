@@ -4,8 +4,8 @@
 		"-sourcedir":"./",
 		"-targetdir": "./",
 		"-prefix":"stx",
-		"-N3-distance": 200,
-		"-template": 0.50,
+		"-N3-distance": "200",
+		"-template": "0.50",
 		"-surfreg-model": "mmuMonkey",
 		"-thickness": "tlaplace:tfs:tlink 30:20",
 		"-lobe_atlas": "icbm152nl-2009a"

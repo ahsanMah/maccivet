@@ -15,15 +15,14 @@ def convert(files, INPUT_FILE_NAME):
 	runsh("mincmorph -dilation {} {}".format(files.SURFtoVOL_LEFT, files.SURFtoVOL_LEFT_DIL) )
 	runsh("skel {} {}".format(files.SURFtoVOL_LEFT_DIL, files.SURFtoVOL_LEFT_DIL_SKEL) )
 
-	SURF_RIGHT_WM = files.CIVET_SURF_PATH + 'stx_' + INPUT_FILE_NAME + '_white_surface_right_81920.obj'
-	SURFtoVOL_RIGHT = SURF_RIGHT_WM[:-4] + '.mnc'
+	files.setFilePath("SURF_RIGHT_WM", files.CIVET_SURF_PATH + 'stx_' + INPUT_FILE_NAME + '_white_surface_right_81920.obj')
+	SURFtoVOL_RIGHT = files.SURF_RIGHT_WM[:-4] + '.mnc'
 	SURFtoVOL_RIGHT_DIL = SURFtoVOL_RIGHT[:-4] + '_dil.mnc'
 	SURFtoVOL_RIGHT_DIL_SKEL = SURFtoVOL_RIGHT_DIL[:-4] + '_skel.mnc'
-	runsh("scan_object_to_volume %s %s %s" %(files.CLS_CLEAN, SURF_RIGHT_WM, SURFtoVOL_RIGHT) )  	
+	runsh("scan_object_to_volume %s %s %s" %(files.CLS_CLEAN, files.SURF_RIGHT_WM, SURFtoVOL_RIGHT) )  	
 	runsh("mincmorph -dilation %s %s" %(SURFtoVOL_RIGHT, SURFtoVOL_RIGHT_DIL) )
 	runsh("skel %s %s" %(SURFtoVOL_RIGHT_DIL, SURFtoVOL_RIGHT_DIL_SKEL) )
 
-	#os.system("rm %s %s" %(SURF_LEFT_WM, SURF_RIGHT_WM) )
 	CLS_CLEAN_COPY = files.CLS_CLEAN[:-4] + '_copy.mnc'
 	runsh("mv %s %s" %(files.CLS_CLEAN, CLS_CLEAN_COPY) )
 	

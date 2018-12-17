@@ -1,3 +1,4 @@
+#!/bin/usr/python
 import argparse, os, re
 import pipeline, helpers
 
