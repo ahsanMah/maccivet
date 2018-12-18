@@ -66,7 +66,7 @@ def excludeHippo(LikeHuman_SUB_MINC, LikeHuman_SEG_MINC):
 		        lhippo_high = labels.Hippo_R+0.5,
 		        rhippo_low  = labels.Hippo_R-0.5,
 		        rhippo_high = labels.Hippo_R+0.5)
-	runsh(minc_cmd+ "{input} {output}".format(input=LikeHuman_SUB_MINC, output=LikeHuman_SUB_MINC_HIPPO) )
+	runsh("{cmd} {input} {output}".format(cmd=minc_cmd, input=LikeHuman_SUB_MINC, output=LikeHuman_SUB_MINC_HIPPO) )
 	runsh("mincmorph -clobber -successive DD {input} {output}".format(input=LikeHuman_SUB_MINC_HIPPO, output=LikeHuman_SUB_MINC_HIPPO) )
 	
 	# Create file without the hippocampal region
