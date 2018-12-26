@@ -47,6 +47,8 @@ class ConfigParser(object):
 	CIVET_PATH = "CIVET_Path"
 	FILEPATHS = "file_paths"
 	LABELS = "labels"
+	INPUT_DIR = "-sourcedir"
+	CWD = "-targetdir"
 
 	def __init__(self, configfile):
 		# Dictionary of the parameters adn their values
@@ -56,6 +58,8 @@ class ConfigParser(object):
 		# Paths to various files used by the pipeline
 		self.filepaths = None
 
+		self.cwd = "./"
+		self.input_dir = "./"
 
 		with open(configfile,'r') as cf:
 			self.config = json.load(cf)
@@ -88,6 +92,8 @@ class ConfigParser(object):
 			self.filepaths.CIVET_Path, flag_str, args)
 
 		self.civet = final_str
+		self.cwd = params[ConfigParser.CWD]
+		self.input_dir = params[ConfigParser.INPUT_DIR]
 
 class FileNames(object):
 	"""List of all the filenames to be used across phases
