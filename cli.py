@@ -4,7 +4,7 @@ import pipeline, helpers
 
 '''
 Specifies all the arguments that the parser can take
-
+Note Absolute paths are required for directories
 '''
 def make_parser():
 	parser = argparse.ArgumentParser()
@@ -15,12 +15,13 @@ def make_parser():
 
 	parser.add_argument("-p","--paramfile", default="config.json", help="path to custom parameter file (default is config.json)")
 
+	parser.add_argument("-in", "--inputdir", help="specify the path to the directory containg the input files (takes precedence over values set in parameter file)")
+
 	return parser
 
 def verify_file(fname):
-	if not os.path.isfile(fname):
+	if not os.path.lexists(fname):
 		raise FileNotFoundError("File \'{}\' does not exist".format(fname))
-
 
 
 if __name__ == "__main__":
@@ -38,9 +39,9 @@ if __name__ == "__main__":
 	# Create symbolic links to input files in working directory
 	for fname in [args.t1_image, args.seg_label, args.sub_label]:
 		src = params.input_dir + "/" + fname
-		if os.path.isfile(fname):
+		if os.path.lexists(fname):
 			os.unlink(fname) #Remove any pre-existing link
 		os.symlink(src,fname)	
 		verify_file(fname)
 
-	pipeline.execute(args, params)
+	# pipeline.execute(args, params)

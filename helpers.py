@@ -58,7 +58,6 @@ class ConfigParser(object):
 		# Paths to various files used by the pipeline
 		self.filepaths = None
 
-		self.cwd = "./"
 		self.input_dir = "/nas/longleaf/home/amahmood/Monkey_CLI/input/"
 
 		with open(configfile,'r') as cf:
@@ -66,11 +65,14 @@ class ConfigParser(object):
 
 		#Build filepath object
 		self.filepaths = FilePaths(self.config[ConfigParser.FILEPATHS])
+		self.cwd = self.filepaths.output_dir
+		self.input_dir = self.filepaths.input_dir
 
 		#Build labels
 		self.labels = Labels(self.config[ConfigParser.LABELS])
 
 		self.buildCivetParams()
+
 
 
 	'''Accepts a type of paramter and builds the corresponding string
@@ -92,8 +94,7 @@ class ConfigParser(object):
 			self.filepaths.CIVET_Path, flag_str, args)
 
 		self.civet = final_str
-		self.cwd = params[ConfigParser.CWD]
-		#self.input_dir = params[ConfigParser.INPUT_DIR]
+		########### SET THE CIVET INPUT AND OUTPUT DIR ########
 
 class FileNames(object):
 	"""List of all the filenames to be used across phases
@@ -114,7 +115,7 @@ class FileNames(object):
 		self.PVE_EXACTWM  = None
 
 	def setFilePath(self,filename, path):
-		setattr(self,filename, path)
+		setattr(self,os.path.abspath(filename), path)
 
 	def __str__(self):
 		return "Parent Directory: {}".format(self.CIVET_WORKING_PATH)
