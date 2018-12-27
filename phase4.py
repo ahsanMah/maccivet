@@ -246,12 +246,12 @@ def transformBack(Stx_Input_T1, files):
 	HR_SURF_RIGHT_WM_RSL = files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_white_surface_rsl_right_327680.obj'
 	HR_SURF_RIGHT_GM_RSL = files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_rsl_right_327680.obj'
 
-	MID_LEFT_RSL_NATIVE = files.MID_LEFT_RSL[:-4] + '_native.obj'
-	HR_SURF_LEFT_WM_RSL_NATIVE = files.HR_SURF_LEFT_WM_RSL[:-4] + '_native.obj'
-	HR_SURF_LEFT_GM_RSL_NATIVE = files.HR_SURF_LEFT_GM_RSL[:-4] + '_native.obj'
-	MID_RIGHT_RSL_NATIVE = files.MID_RIGHT_RSL[:-4] + '_native.obj'
-	HR_SURF_RIGHT_WM_RSL_NATIVE = files.HR_SURF_RIGHT_WM_RSL[:-4] + '_native.obj'
-	HR_SURF_RIGHT_GM_RSL_NATIVE = files.HR_SURF_RIGHT_GM_RSL[:-4] + '_native.obj'
+	MID_LEFT_RSL_NATIVE = MID_LEFT_RSL[:-4] + '_native.obj'
+	HR_SURF_LEFT_WM_RSL_NATIVE = HR_SURF_LEFT_WM_RSL[:-4] + '_native.obj'
+	HR_SURF_LEFT_GM_RSL_NATIVE = HR_SURF_LEFT_GM_RSL[:-4] + '_native.obj'
+	MID_RIGHT_RSL_NATIVE = MID_RIGHT_RSL[:-4] + '_native.obj'
+	HR_SURF_RIGHT_WM_RSL_NATIVE = HR_SURF_RIGHT_WM_RSL[:-4] + '_native.obj'
+	HR_SURF_RIGHT_GM_RSL_NATIVE = HR_SURF_RIGHT_GM_RSL[:-4] + '_native.obj'
 
 	runsh("transform_objects %s %s %s" %(MID_LEFT_RSL ,TAL_XFM_INVERT, MID_LEFT_RSL_NATIVE) )
 	runsh("transform_objects %s %s %s" %(HR_SURF_LEFT_WM_RSL ,TAL_XFM_INVERT, HR_SURF_LEFT_WM_RSL_NATIVE) )
