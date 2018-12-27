@@ -44,4 +44,4 @@ if __name__ == "__main__":
 		os.symlink(src,fname)	
 		verify_file(fname)
 
-	# pipeline.execute(args, params)
+	pipeline.execute(args, params)

@@ -27,8 +27,8 @@ def buildFileNames(INPUT_FILE_NAME):
 	files.PVE_EXACTGM  = files.CIVET_CLASSIFY_PATH + 'stx_' + INPUT_FILE_NAME + '_pve_exactgm.mnc'
 	files.PVE_EXACTWM  = files.CIVET_CLASSIFY_PATH + 'stx_' + INPUT_FILE_NAME + '_pve_exactwm.mnc'
 	
-	files.setFilePath("REFERENCE_MINC", files.CIVET_MINC_FINAL_PATH + 'stx_' + INPUT_FILE_NAME + '_t1_final.mnc')
-	files.setFilePath("TAL_XFM", files.CIVET_TRANSFORM_LINEAR + 'stx_' + INPUT_FILE_NAME + '_t1_tal.xfm')
+	files.setFileName("REFERENCE_MINC", files.CIVET_MINC_FINAL_PATH + 'stx_' + INPUT_FILE_NAME + '_t1_final.mnc')
+	files.setFileName("TAL_XFM", files.CIVET_TRANSFORM_LINEAR + 'stx_' + INPUT_FILE_NAME + '_t1_tal.xfm')
 
 	return files
 

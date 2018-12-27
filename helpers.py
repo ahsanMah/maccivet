@@ -34,7 +34,7 @@ class FilePaths(object):
 	"""
 	def __init__(self, filepaths):
 		for path in filepaths:
-			setattr(self,path,filepaths[path])
+			setattr(self,path, os.path.abspath(filepaths[path]))
 
 class ConfigParser(object):
 	"""This class will read a JSON parameter file and build the necessary strings
@@ -48,7 +48,7 @@ class ConfigParser(object):
 	FILEPATHS = "file_paths"
 	LABELS = "labels"
 	INPUT_DIR = "-sourcedir"
-	CWD = "-targetdir"
+	TARGET_DIR = "-targetdir"
 
 	def __init__(self, configfile):
 		# Dictionary of the parameters adn their values
@@ -79,6 +79,8 @@ class ConfigParser(object):
 	'''
 	def buildCivetParams(self):
 		params = self.config[ConfigParser.CIVET]
+		params[ConfigParser.INPUT_DIR] = self.cwd
+		params[ConfigParser.TARGET_DIR] = self.cwd
 
 		final_str = ""
 		flag_str = ""
@@ -94,7 +96,7 @@ class ConfigParser(object):
 			self.filepaths.CIVET_Path, flag_str, args)
 
 		self.civet = final_str
-		########### SET THE CIVET INPUT AND OUTPUT DIR ########
+
 
 class FileNames(object):
 	"""List of all the filenames to be used across phases
@@ -114,8 +116,8 @@ class FileNames(object):
 		self.PVE_EXACTGM  = None
 		self.PVE_EXACTWM  = None
 
-	def setFilePath(self,filename, path):
-		setattr(self,os.path.abspath(filename), path)
+	def setFileName(self,filename, path):
+		setattr(self,filename, path)
 
 	def __str__(self):
 		return "Parent Directory: {}".format(self.CIVET_WORKING_PATH)

@@ -3,19 +3,19 @@
 from helpers import runsh
 
 def convert(files, INPUT_FILE_NAME):
-	files.setFilePath("CIVET_SURF_PATH", files.CIVET_WORKING_PATH + 'surfaces/')
-	files.setFilePath("CIVET_TEMP_PATH", files.CIVET_WORKING_PATH + 'temp/')
-	files.setFilePath("SURF_LEFT_WM", files.CIVET_SURF_PATH + 'stx_' + INPUT_FILE_NAME + '_white_surface_left_81920.obj')
+	files.setFileName("CIVET_SURF_PATH", files.CIVET_WORKING_PATH + 'surfaces/')
+	files.setFileName("CIVET_TEMP_PATH", files.CIVET_WORKING_PATH + 'temp/')
+	files.setFileName("SURF_LEFT_WM", files.CIVET_SURF_PATH + 'stx_' + INPUT_FILE_NAME + '_white_surface_left_81920.obj')
 
-	files.setFilePath("SURFtoVOL_LEFT", files.SURF_LEFT_WM[:-4] + '.mnc')
-	files.setFilePath("SURFtoVOL_LEFT_DIL", files.SURFtoVOL_LEFT[:-4] + '_dil.mnc')
-	files.setFilePath("SURFtoVOL_LEFT_DIL_SKEL", files.SURFtoVOL_LEFT_DIL[:-4] + '_skel.mnc')
+	files.setFileName("SURFtoVOL_LEFT", files.SURF_LEFT_WM[:-4] + '.mnc')
+	files.setFileName("SURFtoVOL_LEFT_DIL", files.SURFtoVOL_LEFT[:-4] + '_dil.mnc')
+	files.setFileName("SURFtoVOL_LEFT_DIL_SKEL", files.SURFtoVOL_LEFT_DIL[:-4] + '_skel.mnc')
 
 	runsh("scan_object_to_volume {} {} {}".format(files.CLS_CLEAN, files.SURF_LEFT_WM, files.SURFtoVOL_LEFT) )  	
 	runsh("mincmorph -dilation {} {}".format(files.SURFtoVOL_LEFT, files.SURFtoVOL_LEFT_DIL) )
 	runsh("skel {} {}".format(files.SURFtoVOL_LEFT_DIL, files.SURFtoVOL_LEFT_DIL_SKEL) )
 
-	files.setFilePath("SURF_RIGHT_WM", files.CIVET_SURF_PATH + 'stx_' + INPUT_FILE_NAME + '_white_surface_right_81920.obj')
+	files.setFileName("SURF_RIGHT_WM", files.CIVET_SURF_PATH + 'stx_' + INPUT_FILE_NAME + '_white_surface_right_81920.obj')
 	SURFtoVOL_RIGHT = files.SURF_RIGHT_WM[:-4] + '.mnc'
 	SURFtoVOL_RIGHT_DIL = SURFtoVOL_RIGHT[:-4] + '_dil.mnc'
 	SURFtoVOL_RIGHT_DIL_SKEL = SURFtoVOL_RIGHT_DIL[:-4] + '_skel.mnc'

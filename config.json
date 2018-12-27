@@ -12,6 +12,11 @@
 	},
 
 	"file_paths":{
+
+		"input_dir" : "./input/",
+
+		"output_dir": "./output/",
+
 		"CIVET_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1-longleaf/Linux-x86_64/CIVET-2.1.0/",
 
 		"Transform_MonkeyToHuman": "/nas/longleaf/home/amahmood/Monkey_CLI/new_MonkeyToHuman.txt",

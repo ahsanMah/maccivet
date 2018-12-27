@@ -11,27 +11,27 @@ def runSecondIter(Stx_Input_T1, files, parameters):
 	TEMPORAL_TIP_MASK = TEMPORAL_TIP_MASK_PATH + parameters.filepaths.Temporal_Tip_Mask
 	MID_LINE_MASK = TEMPORAL_TIP_MASK_PATH + parameters.filepaths.Midline_Mask
 	
-	files.setFilePath("SURF_LEFT_GM", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_left_81920.obj')
-	files.setFilePath("SURF_RIGHT_GM", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_right_81920.obj')
+	files.setFileName("SURF_LEFT_GM", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_left_81920.obj')
+	files.setFileName("SURF_RIGHT_GM", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_right_81920.obj')
 	
 	SURF_LEFT_GM_1st = files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_left_1st_81920.obj'	
 	SURF_RIGHT_GM_1st = files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_right_1st_81920.obj'
 	runsh("cp {} {}".format(files.SURF_LEFT_GM, SURF_LEFT_GM_1st) )
 	runsh("cp {} {}".format(files.SURF_RIGHT_GM, SURF_RIGHT_GM_1st) )
 	
-	files.setFilePath("SURF_LEFT_MID", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_mid_surface_left_81920.obj')
-	files.setFilePath("SURF_RIGHT_MID", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_mid_surface_right_81920.obj')
+	files.setFileName("SURF_LEFT_MID", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_mid_surface_left_81920.obj')
+	files.setFileName("SURF_RIGHT_MID", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_mid_surface_right_81920.obj')
 	
 	TEMP_FINAL_CLASSIFY = files.CIVET_TEMP_PATH + 'stx_' + Stx_Input_T1 + '_final_classify.mnc'
 	TEMP_SUB_MASK = files.CIVET_TEMP_PATH + 'stx_' + Stx_Input_T1 + '_subcortical_mask.mnc'
-	files.setFilePath("TEMP_FINAL_CALLOSUM", files.CIVET_TEMP_PATH + 'stx_' + Stx_Input_T1 + '_final_callosum.mnc')
+	files.setFileName("TEMP_FINAL_CALLOSUM", files.CIVET_TEMP_PATH + 'stx_' + Stx_Input_T1 + '_final_callosum.mnc')
 	TEMP_CSF_SKEL = files.CIVET_TEMP_PATH + 'stx_' + Stx_Input_T1 + '_csf_skel.mnc'
-	files.setFilePath("TEMP_PATH_2nd", files.CIVET_TEMP_PATH + '2nd/')
+	files.setFileName("TEMP_PATH_2nd", files.CIVET_TEMP_PATH + '2nd/')
 	runsh("mkdir {}".format(files.TEMP_PATH_2nd) )
 	
 	ORIG_CSF = files.TEMP_PATH_2nd + 'orig_csf.mnc'
-	files.setFilePath("OUT_FIELD", files.TEMP_PATH_2nd + 'Out_Field.mnc')
-	files.setFilePath("CLS_2ND", files.TEMP_PATH_2nd + 'CLS_2ND.mnc')
+	files.setFileName("OUT_FIELD", files.TEMP_PATH_2nd + 'Out_Field.mnc')
+	files.setFileName("CLS_2ND", files.TEMP_PATH_2nd + 'CLS_2ND.mnc')
 	
 	ORIG_WM = files.TEMP_PATH_2nd + 'orig_wm.mnc'
 	ORIG_WM_DILATION5 = files.TEMP_PATH_2nd + 'orig_wm_dil5.mnc'	
