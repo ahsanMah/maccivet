@@ -59,7 +59,7 @@ class ConfigParser(object):
 		self.filepaths = None
 
 		self.cwd = "./"
-		self.input_dir = "./"
+		self.input_dir = "/nas/longleaf/home/amahmood/Monkey_CLI/input/"
 
 		with open(configfile,'r') as cf:
 			self.config = json.load(cf)
@@ -93,7 +93,7 @@ class ConfigParser(object):
 
 		self.civet = final_str
 		self.cwd = params[ConfigParser.CWD]
-		self.input_dir = params[ConfigParser.INPUT_DIR]
+		#self.input_dir = params[ConfigParser.INPUT_DIR]
 
 class FileNames(object):
 	"""List of all the filenames to be used across phases

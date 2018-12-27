@@ -32,6 +32,15 @@ if __name__ == "__main__":
 	params = helpers.ConfigParser(args.paramfile)
 
 	# print(params.filepaths)
+	os.chdir(params.cwd)
+	print(os.getcwd())
+	
+	# Create symbolic links to input files in working directory
+	for fname in [args.t1_image, args.seg_label, args.sub_label]:
+		src = params.input_dir + "/" + fname
+		if os.path.isfile(fname):
+			os.unlink(fname) #Remove any pre-existing link
+		os.symlink(src,fname)	
+		verify_file(fname)
 
-	verify_file(args.t1_image)
 	pipeline.execute(args, params)

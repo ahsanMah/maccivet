@@ -2,7 +2,7 @@
 	"CIVET":{
 		"flags": ["-input_is_stx","-lsq12","-resample-surfaces","-combine-surface","-animal","-no-calibrate-white"],
 		"-sourcedir":"./",
-		"-targetdir": "./",
+		"-targetdir": "/nas/longleaf/home/amahmood/Monkey_CLI/output/",
 		"-prefix":"stx",
 		"-N3-distance": "200",
 		"-template": "0.50",
@@ -14,9 +14,9 @@
 	"file_paths":{
 		"CIVET_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1-longleaf/Linux-x86_64/CIVET-2.1.0/",
 
-		"Transform_MonkeyToHuman": "/nas/longleaf/home/shykim/21-MONKEY/new_MonkeyToHuman.txt",
+		"Transform_MonkeyToHuman": "/nas/longleaf/home/amahmood/Monkey_CLI/new_MonkeyToHuman.txt",
 
-		"Human_Template": "/nas/longleaf/home/shykim/21-MONKEY/mni_target_xyflip.nrrd",
+		"Human_Template": "/nas/longleaf/home/amahmood/Monkey_CLI/mni_target_xyflip.nrrd",
 		
 		"Temporal_Masks_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1/Linux-x86_64/share/mni-models/",
 
