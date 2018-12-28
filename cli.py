@@ -48,6 +48,6 @@ if __name__ == "__main__":
 			os.unlink(fname) #Remove any pre-existing link
 		os.symlink(src,fname)	
 
-	# print(params.civet)
+	print(params.civet)
 
-	pipeline.execute(args, params)
+	# pipeline.execute(args, params)

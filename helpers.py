@@ -60,21 +60,32 @@ class ConfigParser(object):
 		# Paths to various files used by the pipeline
 		self.filepaths = None
 		
+		self.cwd = None
+		self.input_dir = None
+
 		configfile = args.paramfile
 		with open(configfile,'r') as cf:
 			self.config = json.load(cf)
 
 		#Build filepath object
 		self.filepaths = FilePaths(self.config[ConfigParser.FILEPATHS])
-		self.cwd = self.filepaths.outputdir
-		self.input_dir = self.filepaths.inputdir
+		
 
 		# Update if user provided dirs
-		if args.inputdir:
-			self.input_dir = os.path.abspath(args.inputdir)
-
 		if args.outputdir:
 			self.cwd = os.path.abspath(args.outputdir)
+		elif hasattr(self.filepaths, "outputdir"):
+			self.cwd = self.filepaths.outputdir
+		else:
+		 raise FileNotFoundError("Please provide an output directory either on the command line or the parameter file!")
+		
+
+		if args.inputdir:
+			self.input_dir = os.path.abspath(args.inputdir)
+		elif hasattr(self.filepaths, "inputdir"):
+			self.input_dir = self.filepaths.inputdir
+		else:
+			raise FileNotFoundError("Please provide an input directory either on the command line or the parameter file!")
 
 		#Build labels
 		self.labels = Labels(self.config[ConfigParser.LABELS])
