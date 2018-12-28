@@ -1,8 +1,6 @@
 {
 	"CIVET":{
 		"flags": ["-input_is_stx","-lsq12","-resample-surfaces","-combine-surface","-animal","-no-calibrate-white"],
-		"-sourcedir":"./",
-		"-targetdir": "/nas/longleaf/home/amahmood/Monkey_CLI/output/",
 		"-prefix":"stx",
 		"-N3-distance": "200",
 		"-template": "0.50",
@@ -13,9 +11,9 @@
 
 	"file_paths":{
 
-		"input_dir" : "./input/",
+		"inputdir" : "./input/",
 
-		"output_dir": "./output/",
+		"outputdir": "./output/",
 
 		"CIVET_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1-longleaf/Linux-x86_64/CIVET-2.1.0/",
 
