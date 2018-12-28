@@ -15,7 +15,9 @@ def make_parser():
 
 	parser.add_argument("-p","--paramfile", default="config.json", help="path to custom parameter file (default is config.json)")
 
-	parser.add_argument("-in", "--inputdir", help="specify the path to the directory containg the input files (takes precedence over values set in parameter file)")
+	parser.add_argument("-in", "--inputdir", help="specify the path to the directory containing the input files (takes precedence over values set in parameter file)")
+
+	parser.add_argument("-out", "--outputdir", help="specify the path to the directory where all the output files should be placed (takes precedence over values set in parameter file)")
 
 	return parser
 
@@ -30,7 +32,9 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	params = helpers.ConfigParser(args.paramfile)
+	print(args.inputdir)
+
+	params = helpers.ConfigParser(args)
 
 	# print(params.filepaths)
 	os.chdir(params.cwd)
@@ -39,9 +43,11 @@ if __name__ == "__main__":
 	# Create symbolic links to input files in working directory
 	for fname in [args.t1_image, args.seg_label, args.sub_label]:
 		src = params.input_dir + "/" + fname
+		verify_file(src)
 		if os.path.lexists(fname):
 			os.unlink(fname) #Remove any pre-existing link
 		os.symlink(src,fname)	
-		verify_file(fname)
+
+	# print(params.civet)
 
 	pipeline.execute(args, params)

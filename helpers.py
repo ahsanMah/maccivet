@@ -38,7 +38,8 @@ class FilePaths(object):
 
 class ConfigParser(object):
 	"""This class will read a JSON parameter file and build the necessary strings
-	   to be run in the command line
+	   to be run in the command line.
+	   Parameters given as command-line arguments take precedence.
 	"""
 
 	# Expected keys in the parameter files - could be changed
@@ -50,23 +51,30 @@ class ConfigParser(object):
 	INPUT_DIR = "-sourcedir"
 	TARGET_DIR = "-targetdir"
 
-	def __init__(self, configfile):
+	def __init__(self, args):
+		
 		# Dictionary of the parameters adn their values
 		self.config = {}
 		# The CIVET command line arguments
 		self.civet = {}
 		# Paths to various files used by the pipeline
 		self.filepaths = None
-
-		self.input_dir = "/nas/longleaf/home/amahmood/Monkey_CLI/input/"
-
+		
+		configfile = args.paramfile
 		with open(configfile,'r') as cf:
 			self.config = json.load(cf)
 
 		#Build filepath object
 		self.filepaths = FilePaths(self.config[ConfigParser.FILEPATHS])
-		self.cwd = self.filepaths.output_dir
-		self.input_dir = self.filepaths.input_dir
+		self.cwd = self.filepaths.outputdir
+		self.input_dir = self.filepaths.inputdir
+
+		# Update if user provided dirs
+		if args.inputdir:
+			self.input_dir = os.path.abspath(args.inputdir)
+
+		if args.outputdir:
+			self.cwd = os.path.abspath(args.outputdir)
 
 		#Build labels
 		self.labels = Labels(self.config[ConfigParser.LABELS])
