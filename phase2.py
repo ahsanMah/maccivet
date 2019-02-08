@@ -7,10 +7,10 @@ import os
 from helpers import runsh
 from helpers import FileNames
 
-Current_dir = os.getcwd() + '/'
 
 def buildFileNames(INPUT_FILE_NAME):
 
+	Current_dir = os.getcwd() + '/'
 	files = FileNames() 
 
 	files.CIVET_WORKING_PATH = Current_dir +  INPUT_FILE_NAME + '/'
@@ -39,26 +39,26 @@ def cleanupFiles(files):
 								files.PVE_DISC , files.PVE_EXACTGM , files.PVE_EXACTWM) )
 
 def recalculatePVE(LikeHuman_SEG_MINC_exHippo,files):
-
-	ABC_SEG_MINC = LikeHuman_SEG_MINC_exHippo
-	runsh("mincresample -nearest -byte -like {} {} {} -transform {}".format(
-		files.REFERENCE_MINC, ABC_SEG_MINC, files.RSL_ABC_SEG, files.TAL_XFM) )
 	
-	# minc_cmd = "minccalc -byte -expr 'if(A[0]>0.6 && A[0]<1.4){out=3}else if(A[0]>1.6 && A[0]<2.4){out=2}else if(A[0]>2.6 && A[0]<3.4){out=1}else if(A[0]>3.8 && A[0]<4.2){out=2}else{out=0}'"
+	ABC_SEG_MINC = LikeHuman_SEG_MINC_exHippo
+    runsh("mincresample -nearest_neighbour -byte -like {} {} {} -transformation {}".format(
+            files.REFERENCE_MINC, ABC_SEG_MINC, files.RSL_ABC_SEG, files.TAL_XFM) )
 
-	minc_cmd = "minccalc -byte -expr 'if(A[0]>{wm_low} && A[0]<{wm_high}){{out=3}}else if(A[0]>{gm_low} && A[0]<{gm_high}){{out=2}}else if(A[0]>{csf_low} && A[0]<{csf_high}){{out=1}}else if(A[0]>{thal_low} && A[0]<{thal_high}){{out=2}}else{{out=0}}'".format(
-			wm_low    = labels.WM - 0.4,
-			wm_high   = labels.WM + 0.4,
-			csf       = labels.CSF,
-			gm_low    = labels.GM - 0.4,
-			gm_high   = labels.GM + 0.4,
-			gm        = labels.GM,
-			csf_low   = labels.CSF - 0.4,
-			csf_high  = labels.CSF + 0.4,
-			thal_low  = labels.Thal - 0.2,
-			thal_high = labels.Thal + 0.2 
-		)
-	runsh(minc_cmd + "{} {}".format(files.RSL_ABC_SEG, files.RSL_ABC_SEG2) )
+
+    minc_cmd = "minccalc -byte -expr 'if(A[0]>{wm_low} && A[0]<{wm_high}){{out=3}}else if(A[0]>{gm_low} && A[0]<{gm_high}){{out=2}}else if(A[0]>{csf_low} && A[0]<{csf_high}){{out=1}}else if(A[0]>{thal_low} && A[0]<{thal_high}){{out=2}}else{{out=0}}' {input_file} {output_file}".format(
+                    wm_low    = labels.WM - 0.4,
+                    wm_high   = labels.WM + 0.4,
+                    csf       = labels.CSF,
+                    gm_low    = labels.GM - 0.4,
+                    gm_high   = labels.GM + 0.4,
+                    gm        = labels.GM,
+                    csf_low   = labels.CSF - 0.4,
+                    csf_high  = labels.CSF + 0.4,
+                    thal_low  = labels.Thal - 0.2,
+                    thal_high = labels.Thal + 0.2,
+                    input_file = files.RSL_ABC_SEG,
+                    output_file =  files.RSL_ABC_SEG2)
+    runsh(minc_cmd)
 	
 	TEMP_CSF = files.CIVET_CLASSIFY_PATH + 'tmp_exactCSF.mnc' 	
 	CSF_BIN = files.PVE_EXACTCSF[:-4] + '_binary.mnc'
