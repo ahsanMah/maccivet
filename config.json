@@ -21,7 +21,10 @@
 
 		"Human_Template": "/nas/longleaf/home/amahmood/Monkey_CLI/mni_target_xyflip.nrrd",
 		
-		"Temporal_Masks_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1/Linux-x86_64/share/mni-models/",
+		"Temporal_Masks_Path" : "/proj/NIRAL/tools/CIVET/CIVETv2.1/Linux-x86_64/share/mni-models/"
+	},
+	
+	"masks":{
 
 		"Temporal_Tip_Mask" : "TEMPORAL_MASK_avg152lin.mnc",
 

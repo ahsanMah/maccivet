@@ -3,6 +3,7 @@ import argparse, os, re
 import pipeline, helpers
 
 '''
+/proj/NIRAL/ .. tools / atlas  ..... NIRAL/user
 Specifies all the arguments that the parser can take
 Note Absolute paths are required for directories
 '''
@@ -48,6 +49,6 @@ if __name__ == "__main__":
 			os.unlink(fname) #Remove any pre-existing link
 		os.symlink(src,fname)	
 
-	print(params.civet)
+	print(params.masks)
 
-	# pipeline.execute(args, params)
+	pipeline.execute(args, params)

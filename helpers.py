@@ -36,6 +36,12 @@ class FilePaths(object):
 		for path in filepaths:
 			setattr(self,path, os.path.abspath(filepaths[path]))
 
+class Masks(object):
+	"""Holds filenames for 	custom masks"""
+	def __init__(self, masks):
+		for path in masks:
+			setattr(self,path, masks[path])
+
 class ConfigParser(object):
 	"""This class will read a JSON parameter file and build the necessary strings
 	   to be run in the command line.
@@ -50,6 +56,7 @@ class ConfigParser(object):
 	LABELS = "labels"
 	INPUT_DIR = "-sourcedir"
 	TARGET_DIR = "-targetdir"
+	MASKS = "masks"
 
 	def __init__(self, args):
 		
@@ -59,7 +66,9 @@ class ConfigParser(object):
 		self.civet = {}
 		# Paths to various files used by the pipeline
 		self.filepaths = None
-		
+		# Names for the mask files that will be used in the script
+		self.masks = {}
+
 		self.cwd = None
 		self.input_dir = None
 
@@ -67,9 +76,12 @@ class ConfigParser(object):
 		with open(configfile,'r') as cf:
 			self.config = json.load(cf)
 
-		#Build filepath object
+		# Build filepath object
 		self.filepaths = FilePaths(self.config[ConfigParser.FILEPATHS])
 		
+		# Get file names for masks
+		self.masks = Masks(self.config[ConfigParser.MASKS])
+
 
 		# Update if user provided dirs
 		if args.outputdir:
@@ -87,7 +99,7 @@ class ConfigParser(object):
 		else:
 			raise FileNotFoundError("Please provide an input directory either on the command line or the parameter file!")
 
-		#Build labels
+		# Build labels
 		self.labels = Labels(self.config[ConfigParser.LABELS])
 
 		self.buildCivetParams()

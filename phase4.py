@@ -8,8 +8,8 @@ from helpers import runsh
 def runSecondIter(Stx_Input_T1, files, parameters):
 
 	TEMPORAL_TIP_MASK_PATH = parameters.filepaths.Temporal_Masks_Path
-	TEMPORAL_TIP_MASK = TEMPORAL_TIP_MASK_PATH + parameters.filepaths.Temporal_Tip_Mask
-	MID_LINE_MASK = TEMPORAL_TIP_MASK_PATH + parameters.filepaths.Midline_Mask
+	TEMPORAL_TIP_MASK = TEMPORAL_TIP_MASK_PATH + "/" + parameters.masks.Temporal_Tip_Mask
+	MID_LINE_MASK = TEMPORAL_TIP_MASK_PATH + "/" + parameters.masks.Midline_Mask
 	
 	files.setFileName("SURF_LEFT_GM", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_left_81920.obj')
 	files.setFileName("SURF_RIGHT_GM", files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_gray_surface_right_81920.obj')
@@ -126,7 +126,7 @@ def runSecondIter(Stx_Input_T1, files, parameters):
 	runsh("minccalc -byte -expr 'if(A[0]>0 && A[0]<1.2){{out=1}}else{{out=0}}' {} {}".format(files.CLS_2ND_TEMP2, files.CLS_2ND_TEMP2_CSF) )
 	runsh("mincmorph -successive ED {} {}".format(files.CLS_2ND_TEMP2_CSF, files.CLS_2ND_TEMP2_CSF_ED) )	
 	runsh("minccalc -byte -expr 'if(A[0]>0){{out=1}}else{{out=A[1]}}' {} {} {}".format(files.CLS_2ND_TEMP2_CSF_ED, files.CLS_2ND_TEMP4, files.CLS_2ND) )
-
+	print(MID_LINE_MASK)
 
 
 def laplacianCorrection(Stx_Input_T1, files):
@@ -237,7 +237,7 @@ def transformBack(Stx_Input_T1, files):
 	######## Transform back to original space ###########
 
 	TAL_XFM_INVERT = files.TAL_XFM[:-4] + '_invert.xfm'
-	runsh("xfminvert %s %s" %(TAL_XFM, TAL_XFM_INVERT) )
+	runsh("xfminvert %s %s" %(files.TAL_XFM, TAL_XFM_INVERT) )
 	
 	MID_LEFT_RSL = files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_mid_surface_rsl_left_327680.obj'
 	HR_SURF_LEFT_WM_RSL = files.CIVET_SURF_PATH + 'stx_' + Stx_Input_T1 + '_white_surface_rsl_left_327680.obj'

@@ -41,13 +41,12 @@ def cleanupFiles(files):
 def recalculatePVE(LikeHuman_SEG_MINC_exHippo,files):
 	
 	ABC_SEG_MINC = LikeHuman_SEG_MINC_exHippo
-    runsh("mincresample -nearest_neighbour -byte -like {} {} {} -transformation {}".format(
-            files.REFERENCE_MINC, ABC_SEG_MINC, files.RSL_ABC_SEG, files.TAL_XFM) )
+	runsh("mincresample -nearest_neighbour -byte -like {} {} {} -transformation {}".format(
+    	files.REFERENCE_MINC, ABC_SEG_MINC, files.RSL_ABC_SEG, files.TAL_XFM) )
 
-
-    minc_cmd = "minccalc -byte -expr 'if(A[0]>{wm_low} && A[0]<{wm_high}){{out=3}}else if(A[0]>{gm_low} && A[0]<{gm_high}){{out=2}}else if(A[0]>{csf_low} && A[0]<{csf_high}){{out=1}}else if(A[0]>{thal_low} && A[0]<{thal_high}){{out=2}}else{{out=0}}' {input_file} {output_file}".format(
-                    wm_low    = labels.WM - 0.4,
-                    wm_high   = labels.WM + 0.4,
+	minc_cmd = "minccalc -byte -expr 'if(A[0]>{wm_low} && A[0]<{wm_high}){{out=3}}else if(A[0]>{gm_low} && A[0]<{gm_high}){{out=2}}else if(A[0]>{csf_low} && A[0]<{csf_high}){{out=1}}else if(A[0]>{thal_low} && A[0]<{thal_high}){{out=2}}else{{out=0}}' {input_file} {output_file}".format(
+    				wm_low    = labels.WM - 0.4,
+    				wm_high   = labels.WM + 0.4,
                     csf       = labels.CSF,
                     gm_low    = labels.GM - 0.4,
                     gm_high   = labels.GM + 0.4,
@@ -58,8 +57,8 @@ def recalculatePVE(LikeHuman_SEG_MINC_exHippo,files):
                     thal_high = labels.Thal + 0.2,
                     input_file = files.RSL_ABC_SEG,
                     output_file =  files.RSL_ABC_SEG2)
-    runsh(minc_cmd)
-	
+	runsh(minc_cmd)
+
 	TEMP_CSF = files.CIVET_CLASSIFY_PATH + 'tmp_exactCSF.mnc' 	
 	CSF_BIN = files.PVE_EXACTCSF[:-4] + '_binary.mnc'
 	CSF_BIN_DIL = CSF_BIN[:-4] + '_dil.mnc'
@@ -96,7 +95,7 @@ def execute(INPUT_T1, LikeHuman_SEG_MINC_exHippo, parameters):
 	# RUN CIVET
 	CIVET_cmd = "{civet_params} -reset-from cortical_masking -reset-to extract_white_surface_right -spawn -run {input_file} > {log_file}".format(
 		        civet_params=parameters.civet, input_file=INPUT_T1, log_file=INPUT_T1+'_log')
-	
+
 	runsh(CIVET_cmd)
 	# print(parameters.civet)
 	return files

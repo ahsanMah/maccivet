@@ -34,8 +34,8 @@ def execute(args, params):
 
 	files = phase2.execute(Stx_Input_T1, LikeHuman_SEG_MINC_exHippo, params)
 
-	#phase3.execute(Stx_Input_T1, files, params)
-	#phase4.execute(Stx_Input_T1, files, params)
+	phase3.execute(Stx_Input_T1, files, params)
+	phase4.execute(Stx_Input_T1, files, params)
 
 
 
