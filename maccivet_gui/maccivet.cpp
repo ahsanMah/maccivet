@@ -6,6 +6,8 @@ maccivet::maccivet(QWidget *parent) :
     ui(new Ui::maccivet)
 {
     ui->setupUi(this);
+
+    this->setCentralWidget(ui->tabWidget);
 }
 
 maccivet::~maccivet()
